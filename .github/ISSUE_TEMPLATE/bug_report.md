@@ -1,11 +1,17 @@
-## Issue Type
-- [ ] Bug
-- [ ] Feature
+---
+
+name: Bug Report
+about: Create a bug report
+title: '[BUG] Write a suitable title'
+labels: 'bug'
+assignees: ''
+
+---
 
 ## Description
 Provide a clear and concise description of the issue.
 
-## Bug Report (Note: Delete if not a bug)
+## Bug Report
 ### Steps to Reproduce
 1. Step one
 2. Step two
@@ -19,9 +25,3 @@ Describe what actually happened.
 
 ### Screenshots/Videos (if applicable)
 Attach any screenshots that help illustrate the problem.
-
-## Feature Request (Note: Delete if not a feature)
-### Acceptance Criteria
-- 1. Criterion 1
-- 2. Criterion 2
-- 3. Criterion 3
