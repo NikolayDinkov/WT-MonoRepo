@@ -22,9 +22,9 @@ Attach any screenshots that help illustrate the problem.
 
 ## Feature Request (Note: Delete if not a feature)
 ### Acceptance Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
+- 1. Criterion 1
+- 2. Criterion 2
+- 3. Criterion 3
 
 ## Additional Context
 Add any other relevant information about the issue here.
