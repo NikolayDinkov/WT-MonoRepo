@@ -25,6 +25,3 @@ Attach any screenshots that help illustrate the problem.
 - 1. Criterion 1
 - 2. Criterion 2
 - 3. Criterion 3
-
-## Additional Context
-Add any other relevant information about the issue here.
