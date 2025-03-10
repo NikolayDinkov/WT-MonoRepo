@@ -8,7 +8,7 @@ To maintain consistency and clarity in our development workflow, we follow a str
 
 ### Format  
 
-'<type>/<author_initials>/<ticket_number>-<short_description>'
+`<type>/<author_initials>/<ticket_number>-<short_description>`
 
 ### Components  
 
