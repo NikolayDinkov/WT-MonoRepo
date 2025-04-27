@@ -6,8 +6,7 @@ export interface IFile extends Document {
   path: string;
   parent: Types.ObjectId | null;
   owner: Types.ObjectId;
-  size: number;
-  mimeType: string;
+
   gridFsId: Types.ObjectId; // <<-- NEW! ID pointing to the GridFS file
   permissions: Types.ObjectId[];
   createdAt: Date;
@@ -19,8 +18,7 @@ const fileSchema = new Schema<IFile>({
   path: { type: Schema.Types.String, required: true },
   parent: { type: Schema.Types.ObjectId, ref: 'Directory', default: null },
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  size: { type: Schema.Types.Number, required: true },
-  mimeType: { type: Schema.Types.String, required: true },
+
   gridFsId: { type: Schema.Types.ObjectId, required: true }, // <<-- reference to the actual file in GridFS
   permissions: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   createdAt: { type: Schema.Types.Date, default: Date.now },
