@@ -13,3 +13,23 @@ export const getSharedDirectoriesForUser = (userId: Types.ObjectId) => {
     permissions: userId,
   });
 };
+
+export const createDirectory = async (
+  name: string,
+  path: string,
+  owner: Types.ObjectId,
+  parent: Types.ObjectId | null,
+  permissions: Types.ObjectId[]
+): Promise<any> => {
+  const directory = new Directory({
+    name,
+    path,
+    owner,
+    parent,
+    permissions,
+  });
+
+  await directory.save();
+
+  return directory;
+};

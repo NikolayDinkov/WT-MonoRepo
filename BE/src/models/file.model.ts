@@ -7,8 +7,6 @@ export interface IFile extends Document {
   parent: Types.ObjectId | null; // Reference to parent directory
   owner: Types.ObjectId; // Owner user
   gridFsId: Types.ObjectId; // Reference to GridFS stored file
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 // Define the File schema

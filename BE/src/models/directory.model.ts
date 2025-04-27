@@ -7,8 +7,6 @@ export interface IDirectory extends Document {
   parent: Types.ObjectId | null; // Reference to the parent directory
   owner: Types.ObjectId; // Reference to the user who owns the directory
   permissions: Types.ObjectId[]; // Array of user references with access permissions
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 // Define the Directory schema
