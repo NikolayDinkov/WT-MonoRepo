@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { connectDB } from './database';
+import { connectDB } from './utils/database';
 import mongoose from 'mongoose';
 import { upload } from './utils/upload';
 
