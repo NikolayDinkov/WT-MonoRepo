@@ -1,0 +1,13 @@
+.file-item {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #e6f0ff;
+    color: #003366;
+    transition: background-color 0.3s;
+  }
+  
+  .file-item:hover {
+    background-color: #cce0ff;
+  }
+  
