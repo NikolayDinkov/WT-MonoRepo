@@ -1,16 +1,15 @@
 import { Types } from 'mongoose';
 import Element from '../models/element.model';
 
-export const getRootElementsForUser = (userId: Types.ObjectId) => {
-  return Element.find({
-    parent: null,
-    owner: userId,
-  });
-};
-
 export const getSharedElementsForUser = (userId: Types.ObjectId) => {
   return Element.find({
     sharedWith: userId,
+  });
+};
+
+export const getAllElementsForOwner = (userId: Types.ObjectId) => {
+  return Element.find({
+    owner: userId,
   });
 };
 

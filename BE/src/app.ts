@@ -1,66 +1,45 @@
 import express, { Request, Response } from 'express';
-import { connectDB } from './utils/database';
+import cors from 'cors';
+import { connectDB } from './config/database';
 import mongoose from 'mongoose';
-import { upload } from './utils/upload';
-
-const app = express();
-
-connectDB();
-
-let bucket;
-(() => {
-  mongoose.connection.on('connected', () => {
-    if (!mongoose.connection.db) {
-      throw new Error('Database connection is not available.');
-    }
-
-    bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-      bucketName: 'filesBucket',
-    });
-  });
-})();
+import router from './routes';
 
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json());
+connectDB()
+  .then(() => {
+    const app = express();
 
-// Routes
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World with TypeScript and MongoDB!');
-});
+    app.use(express.json());
 
-// Upload single file
-app.post('/upload/file', upload().single('file'), async (req, res) => {
-  try {
-    res.status(201).json({ text: 'File uploaded successfully !' });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({
-      error: { text: 'Unable to upload the file', error },
+    app.use(
+      cors({
+        origin: 'http://localhost:5173', // allow frontend Vite app
+        credentials: true, // allow cookies if needed
+      })
+    );
+
+    app.use('', router);
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
     });
-  }
-});
-
-// Upload multiple files
-app.post('/upload/files', upload().array('files'), async (req, res) => {
-  try {
-    res.status(201).json({ text: 'Files uploaded successfully !' });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({
-      error: { text: `Unable to upload files`, error },
-    });
-  }
-});
-
-// Start the server
-const startServer = async () => {
-  await connectDB();
-
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+    process.exit(1); // exit the process if DB connection fails
   });
-};
 
-startServer();
+//this must be invoked for the GridFs library and is supposed to be used right after the db is connected
+// let bucket;
+// (() => {
+//   mongoose.connection.on('connected', () => {
+//     if (!mongoose.connection.db) {
+//       throw new Error('Database connection is not available.');
+//     }
+
+//     bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+//       bucketName: 'filesBucket',
+//     });
+//   });
+// })();
