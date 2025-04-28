@@ -1,11 +1,21 @@
+import { useState } from 'react';
 import './App.css';
+import Sidebar from './components/Sidebar/Sidebar';
+import Header from './components/Header/Header';
+import MainContent from './components/MainContent/MainContent';
 
-function App() {
+const App = () => {
+  const [activePage, setActivePage] = useState('myDrive');
+
   return (
-    <>
-      <p>Hello Wolrd!</p>
-    </>
+    <div className="app">
+      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <div className="main-area">
+        <Header />
+        <MainContent activePage={activePage} />
+      </div>
+    </div>
   );
-}
+};
 
 export default App;
