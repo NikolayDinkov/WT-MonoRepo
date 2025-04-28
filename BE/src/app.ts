@@ -30,6 +30,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello World with TypeScript and MongoDB!');
 });
 
+// Upload single file
 app.post('/upload/file', upload().single('file'), async (req, res) => {
   try {
     res.status(201).json({ text: 'File uploaded successfully !' });
@@ -37,6 +38,18 @@ app.post('/upload/file', upload().single('file'), async (req, res) => {
     console.log(error);
     res.status(400).json({
       error: { text: 'Unable to upload the file', error },
+    });
+  }
+});
+
+// Upload multiple files
+app.post('/upload/files', upload().array('files'), async (req, res) => {
+  try {
+    res.status(201).json({ text: 'Files uploaded successfully !' });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      error: { text: `Unable to upload files`, error },
     });
   }
 });
