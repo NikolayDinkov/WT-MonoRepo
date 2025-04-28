@@ -1,24 +1,45 @@
 import express, { Request, Response } from 'express';
-import { connectDB } from './database';
+import cors from 'cors';
+import { connectDB } from './config/database';
+import mongoose from 'mongoose';
+import router from './routes';
 
-const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json());
+connectDB()
+  .then(() => {
+    const app = express();
 
-// Routes
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World with TypeScript and MongoDB!');
-});
+    app.use(express.json());
 
-// Start the server
-const startServer = async () => {
-  await connectDB();
-  
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    app.use(
+      cors({
+        origin: 'http://localhost:5173', // allow frontend Vite app
+        credentials: true, // allow cookies if needed
+      })
+    );
+
+    app.use('', router);
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+    process.exit(1); // exit the process if DB connection fails
   });
-};
 
-startServer();
+//this must be invoked for the GridFs library and is supposed to be used right after the db is connected
+// let bucket;
+// (() => {
+//   mongoose.connection.on('connected', () => {
+//     if (!mongoose.connection.db) {
+//       throw new Error('Database connection is not available.');
+//     }
+
+//     bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+//       bucketName: 'filesBucket',
+//     });
+//   });
+// })();

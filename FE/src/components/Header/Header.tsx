@@ -1,7 +1,9 @@
+import React from 'react';
 import './Header.css';
 import { FiSearch } from 'react-icons/fi'; // Импортираме иконата лупа
+import { HeaderProps } from '../../interfaces/HeaderProps';
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = ({ myDrive }) => {
   return (
     <div className="header">
       <div className="search-wrapper">
