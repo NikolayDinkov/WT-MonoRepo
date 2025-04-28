@@ -1,20 +1,32 @@
-import { useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Header/Header';
 import MainContent from './components/MainContent/MainContent';
 
 const App = () => {
-  const [activePage, setActivePage] = useState('myDrive');
-
   return (
-    <div className="app">
-      <Sidebar activePage={activePage} setActivePage={setActivePage} />
-      <div className="main-area">
-        <Header />
-        <MainContent activePage={activePage} />
+    <Router>
+      <div className="app">
+        <Sidebar />
+        <div className="main-area">
+          <Header />
+          <Routes>
+            <Route path="/my-drive" element={<MainContent page="myDrive" />} />
+            <Route
+              path="/shared-with-me"
+              element={<MainContent page="shared" />}
+            />
+            <Route path="*" element={<Navigate to="/my-drive" replace />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 };
 

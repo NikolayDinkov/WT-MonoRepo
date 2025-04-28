@@ -2,14 +2,14 @@ import React from 'react';
 import './MainContent.css';
 
 interface MainContentProps {
-  activePage: string;
+  page: string;
 }
 
-const MainContent: React.FC<MainContentProps> = ({ activePage }) => {
+const MainContent: React.FC<MainContentProps> = ({ page }) => {
   return (
     <div className="main-content">
-      {activePage === 'myDrive' && <h1>Моят Диск</h1>}
-      {activePage === 'shared' && <h1>Споделено с мен</h1>}
+      {page === 'myDrive' && <h1>Моят Диск</h1>}
+      {page === 'shared' && <h1>Споделено с мен</h1>}
     </div>
   );
 };

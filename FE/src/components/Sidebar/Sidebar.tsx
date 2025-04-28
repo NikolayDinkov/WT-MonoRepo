@@ -1,13 +1,8 @@
-import React from 'react';
 import './Sidebar.css';
 import { FaHdd, FaUsers } from 'react-icons/fa';
+import { NavLink } from 'react-router-dom';
 
-interface SidebarProps {
-  activePage: string;
-  setActivePage: (page: string) => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) => {
+const Sidebar = () => {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -19,20 +14,25 @@ const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) => {
       </div>
 
       <div className="sidebar-buttons">
-        <button
-          className={`sidebar-button ${activePage === 'myDrive' ? 'active' : ''}`}
-          onClick={() => setActivePage('myDrive')}
+        <NavLink
+          to="/my-drive"
+          className={({ isActive }) =>
+            `sidebar-button ${isActive ? 'active' : ''}`
+          }
         >
           <FaHdd className="sidebar-icon" />
           Моят Диск
-        </button>
-        <button
-          className={`sidebar-button ${activePage === 'shared' ? 'active' : ''}`}
-          onClick={() => setActivePage('shared')}
+        </NavLink>
+
+        <NavLink
+          to="/shared-with-me"
+          className={({ isActive }) =>
+            `sidebar-button ${isActive ? 'active' : ''}`
+          }
         >
           <FaUsers className="sidebar-icon" />
           Споделено с мен
-        </button>
+        </NavLink>
       </div>
     </div>
   );
