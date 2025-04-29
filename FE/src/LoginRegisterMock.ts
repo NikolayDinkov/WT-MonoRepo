@@ -1,10 +1,10 @@
-type User = {
+interface User {
   firstName: string;
   lastName: string;
   username: string;
   email: string;
   password: string;
-};
+}
 
 export function registerUser(user: User): boolean {
   const usersJSON = localStorage.getItem('users');
