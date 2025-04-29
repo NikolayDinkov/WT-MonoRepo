@@ -3,6 +3,7 @@
   padding: 20px;
   border: 1px solid lightgrey;
   border-radius: 8px;
+  margin: 10px auto;
 }
 
 .login-form h2 {
