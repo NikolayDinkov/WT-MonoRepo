@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
   const filteredElements = myDrive.filter((el) => {
     const matchesText = el.name
       .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+      .includes(searchTerm.trim().toLowerCase());
     const matchesType = filterType === 'all' || el.type === filterType;
     return matchesText && matchesType;
   });
