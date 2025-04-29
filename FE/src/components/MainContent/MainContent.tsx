@@ -31,7 +31,6 @@ const MainContent: React.FC<MainContentProps> = ({ page, myDrive }) => {
     <div className="main-content">
       {page === 'myDrive' && (
         <>
-          <h1>Моят Диск</h1>
           <FileList
             directories={directories}
             files={files}
