@@ -1,56 +1,32 @@
 import { Types } from 'mongoose';
-import Element from '../models/element.model';
+import Element, { IElement } from '../models/element.model';
 
 export const getSharedElementsForUser = (userId: Types.ObjectId) => {
-  return Element.find({
-    sharedWith: userId,
-  });
+  return Element.find({ sharedWith: userId }).lean().exec();
 };
 
 export const getAllElementsForOwner = (userId: Types.ObjectId) => {
-  return Element.find({
-    owner: userId,
-  });
+  return Element.find({ owner: userId }).lean().exec();
 };
 
-export const getElementsByName = (name: String) => {
-  return Element.find({
-    name: name,
-  });
+export const getElementsByName = (name: string) => {
+  return Element.find({ name }).lean().exec();
 };
 
-export const getFilesByName = (name: String) => {
-  return Element.find({
-    name: name,
-    type: 'File',
-  });
+export const getFilesByName = (name: string) => {
+  return Element.find({ name, type: 'File' }).lean().exec();
 };
 
-export const getDirectoriesByName = (name: String) => {
-  return Element.find({
-    name: name,
-    type: 'Directory',
-  });
+export const getDirectoriesByName = (name: string) => {
+  return Element.find({ name, type: 'Directory' }).lean().exec();
 };
 
-export const createElement = async (
-  name: string,
-  path: string,
-  owner: Types.ObjectId,
-  parent: Types.ObjectId | null,
-  sharedWith: Types.ObjectId[],
-  gridFsId: Types.ObjectId | null
-): Promise<any> => {
-  const element = new Element({
-    name,
-    path,
-    owner,
-    parent,
-    sharedWith,
-    gridFsId,
-  });
-
-  await element.save();
-
-  return element;
-};
+export const createElement = (elementData: {
+  name: string;
+  path: string;
+  owner: Types.ObjectId;
+  parent: Types.ObjectId | null;
+  sharedWith: Types.ObjectId[];
+  gridFsId: Types.ObjectId | null;
+  type: 'File' | 'Directory';
+}) => new Element(elementData).save();
