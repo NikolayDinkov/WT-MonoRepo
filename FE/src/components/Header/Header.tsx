@@ -84,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
                       gap: '8px',
                     }}
                   >
-                    {element.type === 'folder' ? (
+                    {element.type === 'directory' ? (
                       <FiFolder className="result-icon" />
                     ) : (
                       <FiFileText className="result-icon" />

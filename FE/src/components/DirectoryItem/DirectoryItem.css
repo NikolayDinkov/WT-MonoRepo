@@ -1,0 +1,30 @@
+.item-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  margin: 8px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.item-container:hover {
+  background-color: #e6f0ff;
+}
+
+.item-icon {
+  font-size: 20px;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.file-size {
+  margin-left: auto;
+  color: #555;
+  font-size: 14px;
+}

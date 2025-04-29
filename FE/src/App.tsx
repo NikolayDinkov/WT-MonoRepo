@@ -20,7 +20,6 @@ const App = () => {
       .then((res) => setMyDrive(res))
       .catch((error) => console.error(error));
   }, []);
-  console.log(myDrive);
 
   return (
     <Router>
@@ -29,10 +28,13 @@ const App = () => {
         <div className="main-area">
           <Header myDrive={myDrive} />
           <Routes>
-            <Route path="/my-drive" element={<MainContent page="myDrive" />} />
+            <Route
+              path="/my-drive/:directoryId?"
+              element={<MainContent page="myDrive" myDrive={myDrive} />}
+            />
             <Route
               path="/shared-with-me"
-              element={<MainContent page="shared" />}
+              element={<MainContent page="shared" myDrive={myDrive} />}
             />
             <Route path="*" element={<Navigate to="/my-drive" replace />} />
           </Routes>

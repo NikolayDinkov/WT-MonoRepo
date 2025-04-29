@@ -20,7 +20,9 @@ const Sidebar = () => {
             `sidebar-button ${isActive ? 'active' : ''}`
           }
         >
-          <FaHdd className="sidebar-icon" />
+          <span className="sidebar-icon">
+            <FaHdd />
+          </span>
           Моят Диск
         </NavLink>
 
@@ -30,7 +32,9 @@ const Sidebar = () => {
             `sidebar-button ${isActive ? 'active' : ''}`
           }
         >
-          <FaUsers className="sidebar-icon" />
+          <span className="sidebar-icon">
+            <FaUsers />
+          </span>
           Споделено с мен
         </NavLink>
       </div>
