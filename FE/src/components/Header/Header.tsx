@@ -3,7 +3,7 @@ import './Header.css';
 import { FiSearch, FiX, FiFolder, FiFileText } from 'react-icons/fi';
 import { HeaderProps } from '../../interfaces/HeaderProps';
 
-const Header: React.FC<HeaderProps> = ({ myDrive }) => {
+const Header: React.FC<HeaderProps> = ({ myDrive, onLogout }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'folder' | 'file'>(
@@ -102,6 +102,9 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
           </div>
         )}
       </div>
+      <button className="exit-button" onClick={onLogout}>
+        Изход
+      </button>
     </div>
   );
 };

@@ -123,3 +123,13 @@
   outline: none;
   cursor: pointer;
 }
+
+.exit-button {
+  cursor: pointer;
+  padding: 10px;
+  background-color: rgb(107, 107, 185);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-left: auto;
+}
