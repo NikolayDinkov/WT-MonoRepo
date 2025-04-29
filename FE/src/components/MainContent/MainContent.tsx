@@ -9,13 +9,6 @@ interface MainContentProps {
   page: string;
   myDrive: Element[];
 }
-// interface MainContentProps {
-//   page: string;
-//   directories: Directory[];
-//   files: File[];
-//   onDirectoryClick: (directory: Directory) => void;
-//   goBack?: () => void;
-// }
 
 const MainContent: React.FC<MainContentProps> = ({ page, myDrive }) => {
   const { directoryId } = useParams<{ directoryId: string }>();
@@ -31,21 +24,8 @@ const MainContent: React.FC<MainContentProps> = ({ page, myDrive }) => {
   );
 
   const handleDirectoryClick = (directory: Directory) => {
-    console.log(directory._id);
-    navigate(`/my-drive/${directory._id}`); // навигиране към новата директория
+    navigate(`/my-drive/${directory._id}`); // Navigate to the clicked directory
   };
-
-  // const handleGoBack = () => {
-  //   const currentDirectory = myDrive.find(
-  //     (el) => el.type === 'directory' && el._id === currentPath
-  //   );
-
-  //   if (currentDirectory && currentDirectory.parent !== undefined) {
-  //     setCurrentPath(currentDirectory.parent); // връщаме към родителя
-  //   } else {
-  //     setCurrentPath(null); // fallback
-  //   }
-  // };
 
   return (
     <div className="main-content">
