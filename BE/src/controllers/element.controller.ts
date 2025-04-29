@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 
 import { getAllElementsForOwner, uploadFileForOwner } from '../services/element.service';
 
-const getElements = (req: Request, res: Response) => {
+const getElements = (req: Request, res: Response) => {  
   const ownerId = new Types.ObjectId(req.params.ownerId);
   try {
     getAllElementsForOwner(ownerId).then((elements) =>
@@ -15,6 +15,7 @@ const getElements = (req: Request, res: Response) => {
 };
 
 const uploadFile = (req: Request, res: Response): void => {
+  console.log('uploadFile called');
   const ownerId = new Types.ObjectId(req.params.ownerId);
   try {
     const { file } = req;
@@ -23,7 +24,7 @@ const uploadFile = (req: Request, res: Response): void => {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) /*10MB limit*/ {
+    if (file.size > 15 * 1024 * 1024) /*15MB limit*/ {
       res.status(400).json({ error: 'File size exceeds limit' });
       return;
     }
@@ -40,7 +41,7 @@ const uploadFile = (req: Request, res: Response): void => {
         size,
       },
     });
-    
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
