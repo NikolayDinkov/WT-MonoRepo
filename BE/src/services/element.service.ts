@@ -1,5 +1,8 @@
 import { Types } from 'mongoose';
 import Element, { IElement } from '../models/element.model';
+import { getGridFSBucket } from '../config/database';
+import { Response } from 'express';
+import mongoose from 'mongoose';
 
 export const getSharedElementsForUser = (userId: Types.ObjectId) => {
   return Element.find({ sharedWith: userId }).lean().exec();
@@ -32,6 +35,25 @@ export const uploadFilesForOwner = (ownerId: Types.ObjectId, files: Express.Mult
     // Logic to handle file upload
   });
 }
+
+export const downloadFileById = async (fileId: string, res: Response): Promise<void> => {
+  const bucket = getGridFSBucket();
+
+    const files = await bucket.find({ _id: new mongoose.Types.ObjectId(fileId) }).toArray();
+    if (files.length === 0) {
+      res.status(404).json({ error: 'File not found' });
+      return;
+    }
+
+    const file = files[0];
+    
+    res.set("Content-Type", file.contentType);
+    res.set("Content-Disposition", `attachment; filename=${file.filename}`);
+
+    const downloadStream = bucket.openDownloadStream(new mongoose.Types.ObjectId(fileId));
+
+    downloadStream.pipe(res);
+};
 
 export const createElement = (elementData: {
   name: string;

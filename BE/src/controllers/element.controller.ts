@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 
-import { getAllElementsForOwner, uploadFileForOwner, uploadFilesForOwner } from '../services/element.service';
+import { getAllElementsForOwner, uploadFileForOwner, uploadFilesForOwner, downloadFileById } from '../services/element.service';
 
 const getElements = (req: Request, res: Response) => {
   const ownerId = new Types.ObjectId(req.params.ownerId);
@@ -86,4 +86,14 @@ const uploadFiles = (req: Request, res: Response): void => {
   }
 };
 
-export default { getElements, uploadFile, uploadFiles };
+const downloadFile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const fileId = req.params.fileId;
+    await downloadFileById(fileId, res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export default { getElements, uploadFile, uploadFiles, downloadFile };

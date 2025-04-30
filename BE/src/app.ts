@@ -1,13 +1,14 @@
-import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { connectDB, getGridFSBucket } from './config/database';
-import mongoose from 'mongoose';
 import router from './routes';
+
+import express, { Request, Response } from 'express';
+import { connectDB } from './config/database';
+// import { initGridFSBucket } from './services/gridfs.service';
 
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
-  getGridFSBucket(); // Initialize GridFSBucket after DB connection
+  // initGridFSBucket(); // Initialize GridFSBucket for the first time after DB connection
 });
 
 const app = express();

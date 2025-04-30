@@ -17,6 +17,5 @@ export function upload() {
     },
   });
 
-  console.log('upload function called');
   return multer({ storage: storage as unknown as multer.StorageEngine });
 }
