@@ -1,12 +1,14 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { connectDB } from './config/database';
+import { connectDB, getGridFSBucket } from './config/database';
 import mongoose from 'mongoose';
 import router from './routes';
 
 const PORT = process.env.PORT || 5000;
 
-connectDB();
+connectDB().then(() => {
+  getGridFSBucket(); // Initialize GridFSBucket after DB connection
+});
 
 const app = express();
 
@@ -19,35 +21,7 @@ app.use(
 );
 app.use('/', router);
 
-// getGridFSBucket(); // Initialize GridFSBucket after DB connection
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
-let bucket;
-(() => {
-  mongoose.connection.on("connected", () => {
-    if (!mongoose.connection.db) {
-      throw new Error("Database connection is not available.");
-    }
-
-    bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-      bucketName: "filesBucket",
-    });
-  });
-})();
-
-//this must be invoked for the GridFs library and is supposed to be used right after the db is connected
-// let bucket;
-// (() => {
-//   mongoose.connection.on('connected', () => {
-//     if (!mongoose.connection.db) {
-//       throw new Error('Database connection is not available.');
-//     }
-
-//     bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-//       bucketName: 'filesBucket',
-//     });
-//   });
-// })();

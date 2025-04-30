@@ -22,12 +22,16 @@ export const getDirectoriesByName = (name: string) => {
 };
 
 export const uploadFileForOwner = (ownerId: Types.ObjectId, file: Express.Multer.File) => {
-  // I'm using Atlas GridFS for file storage
-  // and the file is stored in the database with a reference to the ownerId
-
   const { originalname, mimetype, size, buffer } = file;
-  
 };
+
+export const uploadFilesForOwner = (ownerId: Types.ObjectId, files: Express.Multer.File[]) => {
+  files.forEach((file) => {
+    const { originalname, mimetype, size, buffer } = file;
+    
+    // Logic to handle file upload
+  });
+}
 
 export const createElement = (elementData: {
   name: string;
