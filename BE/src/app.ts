@@ -3,13 +3,10 @@ import router from './routes';
 
 import express, { Request, Response } from 'express';
 import { connectDB } from './config/database';
-// import { initGridFSBucket } from './services/gridfs.service';
 
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  // initGridFSBucket(); // Initialize GridFSBucket for the first time after DB connection
-});
+connectDB();
 
 const app = express();
 

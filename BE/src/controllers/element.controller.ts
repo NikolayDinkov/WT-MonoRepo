@@ -1,99 +1,96 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 
-import { getAllElementsForOwner, uploadFileForOwner, uploadFilesForOwner, downloadFileById } from '../services/element.service';
+import * as ElementService from '../services/element.service';
+import * as FileService from '../services/file.service';
 
-const getElements = (req: Request, res: Response) => {
-  const ownerId = new Types.ObjectId(req.params.ownerId);
+const getElements = async (req: Request, res: Response) => {
   try {
-    getAllElementsForOwner(ownerId).then((elements) =>
-      res.status(200).json(elements)
-    );
-  } catch {
-    res.status(500).json({ error: 'Internal Server Error' });
+    const ownerId = new Types.ObjectId(req.params.ownerId);
+    const elements = await ElementService.getAllElementsForOwner(ownerId);
+    res.status(200).json(elements);
+  } catch (error) {
+    res.status(400).json({ error: 'Failed to fetch elements' });
   }
 };
 
-const uploadFile = (req: Request, res: Response): void => {
-  const ownerId = new Types.ObjectId(req.params.ownerId);
+const uploadFile = async (req: Request, res: Response) => {
   try {
-    const { file } = req;
-    if (!file) {
-      res.status(400).json({ error: 'Could not read file' });
-      return;
+    const ownerId = new Types.ObjectId(req.params.ownerId);
+    if (req.file) {
+      await FileService.uploadFileForOwner(ownerId, req.file);
+      res.status(200).json({ message: 'File uploaded successfully' });
+    } else {
+      res.status(400).json({ error: 'No file provided' });
     }
-
-    if (file.size > 15 * 1024 * 1024) /*15MB limit*/ {
-      res.status(400).json({ error: 'File size exceeds limit' });
-      return;
-    }
-
-    const { originalname, mimetype, size, buffer } = file;
-
-    uploadFileForOwner(ownerId, file);
-
-    res.status(201).json({
-      message: `File uploaded successfully`,
-      file: {
-        name: originalname,
-        type: mimetype,
-        size: size,
-      },
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+  } catch (error) {
+    res.status(400).json({ error: 'File upload failed' });
   }
 };
 
-
-const uploadFiles = (req: Request, res: Response): void => {
-  const ownerId = new Types.ObjectId(req.params.ownerId);
+const uploadFiles = async (req: Request, res: Response) => {
   try {
-    const { files } = req;
-    if (!files) {
-      res.status(400).json({ error: 'Could not read files' });
-      return;
+    const ownerId = new Types.ObjectId(req.params.ownerId);
+    if (req.files && Array.isArray(req.files)) {
+      await FileService.uploadFilesForOwner(ownerId, req.files as Express.Multer.File[]);
+      res.status(200).json({ message: 'Files uploaded successfully' });
+    } else {
+      res.status(400).json({ error: 'No files provided' });
     }
-    if (!Array.isArray(files)) {
-      res.status(400).json({ error: 'Files should be an array' });
-      return;
-    }
-    if (files.some(file => !file)) {
-      res.status(400).json({ error: 'Could not read one or more files' });
-      return;
-    }
-    if (files.some(file => file.size > 15 * 1024 * 1024)) /*15MB limit*/ {
-      res.status(400).json({ error: 'One or more files size exceeds limit' });
-      return;
-    }
-
-    uploadFilesForOwner(ownerId, files);
-
-    res.status(201).json({
-      message: `Files uploaded successfully`,
-      files: files.map(file => ({
-        name: file.originalname,
-        type: file.mimetype,
-        size: file.size,
-      })),
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+  } catch (error) {
+    res.status(400).json({ error: 'Files upload failed' });
   }
 };
 
-const downloadFile = async (req: Request, res: Response): Promise<void> => {
+const downloadFile = async (req: Request, res: Response) => {
   try {
-    const fileId = req.params.fileId;
-    await downloadFileById(fileId, res);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    const { stream, file } = await FileService.downloadFileById(req.params.fileId);
+    res.set("Content-Type", file.contentType);
+    res.set("Content-Disposition", `attachment; filename=${file.filename}`);
+    stream.pipe(res);
+  } catch (error) {
+    res.status(404).json({ error: 'File not found' });
   }
 };
 
-export default { getElements, uploadFile, uploadFiles, downloadFile };
+const downloadFiles = async (_req: Request, res: Response) => {
+  try {
+    const { archive } = await FileService.downloadMultipleFiles();
+    res.set("Content-Type", "application/zip");
+    res.set("Content-Disposition", "attachment; filename=files.zip");
+    res.set("Access-Control-Allow-Origin", "*");
+    archive.pipe(res);
+  } catch (error) {
+    res.status(404).json({ error: 'No files to download' });
+  }
+};
+
+const renameFile = async (req: Request, res: Response) => {
+  try {
+    const { fileId, newName } = req.body;
+    const result = await FileService.renameFileById(fileId, newName);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(404).json({ error: 'Rename failed' });
+  }
+};
+
+const deleteFile = async (req: Request, res: Response) => {
+  try {
+    const { fileId } = req.body;
+    const result = await FileService.deleteFileById(fileId);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(404).json({ error: 'Delete failed' });
+  }
+};
+
+export default {
+  getElements,
+  uploadFile,
+  uploadFiles,
+  downloadFile,
+  downloadFiles,
+  renameFile,
+  deleteFile,
+};
