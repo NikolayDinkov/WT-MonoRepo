@@ -9,8 +9,8 @@ const getElements = async (req: Request, res: Response) => {
     const ownerId = new Types.ObjectId(req.params.ownerId);
     const elements = await ElementService.getAllElementsForOwner(ownerId);
     res.status(200).json(elements);
-  } catch (error) {
-    res.status(400).json({ error: 'Failed to fetch elements' });
+  } catch (exError: any) {
+    res.status(400).json({ error: exError.message || 'Failed to fetch elements' });
   }
 };
 
@@ -23,8 +23,8 @@ const uploadFile = async (req: Request, res: Response) => {
     } else {
       res.status(400).json({ error: 'No file provided' });
     }
-  } catch (error) {
-    res.status(400).json({ error: 'File upload failed' });
+  } catch (exError: any) {
+    res.status(400).json({ error: exError.message || 'File upload failed' });
   }
 };
 
@@ -37,8 +37,8 @@ const uploadFiles = async (req: Request, res: Response) => {
     } else {
       res.status(400).json({ error: 'No files provided' });
     }
-  } catch (error) {
-    res.status(400).json({ error: 'Files upload failed' });
+  } catch (exError: any) {
+    res.status(400).json({ error: exError.message || 'Files upload failed' });
   }
 };
 
@@ -48,8 +48,8 @@ const downloadFile = async (req: Request, res: Response) => {
     res.set("Content-Type", file.contentType);
     res.set("Content-Disposition", `attachment; filename=${file.filename}`);
     stream.pipe(res);
-  } catch (error) {
-    res.status(404).json({ error: 'File not found' });
+  } catch (exError: any) {
+    res.status(400).json({ error: exError.message || 'File not found' });
   }
 };
 
@@ -60,8 +60,8 @@ const downloadFiles = async (_req: Request, res: Response) => {
     res.set("Content-Disposition", "attachment; filename=files.zip");
     res.set("Access-Control-Allow-Origin", "*");
     archive.pipe(res);
-  } catch (error) {
-    res.status(404).json({ error: 'No files to download' });
+  } catch (exError: any) {
+    res.status(400).json({ error: exError.message || 'No files to download' });
   }
 };
 
@@ -70,8 +70,8 @@ const renameFile = async (req: Request, res: Response) => {
     const { fileId, newName } = req.body;
     const result = await FileService.renameFileById(fileId, newName);
     res.status(200).json(result);
-  } catch (error) {
-    res.status(404).json({ error: 'Rename failed' });
+  } catch (exError: any) {
+    res.status(400).json({ error: exError.message || 'Rename failed' });
   }
 };
 
