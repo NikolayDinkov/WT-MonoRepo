@@ -77,11 +77,11 @@ const renameFile = async (req: Request, res: Response) => {
 
 const deleteFile = async (req: Request, res: Response) => {
   try {
-    const { fileId } = req.body;
+    const { fileId } = req.params;
     const result = await FileService.deleteFileById(fileId);
     res.status(200).json(result);
-  } catch (error) {
-    res.status(404).json({ error: 'Delete failed' });
+  } catch (exError: any) {
+    res.status(404).json({ error: exError.message || 'Delete failed' });
   }
 };
 

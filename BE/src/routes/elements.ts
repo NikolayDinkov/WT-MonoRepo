@@ -10,5 +10,6 @@ router.post('/upload/file/:ownerId', upload().single('file'), elementController.
 router.post('/upload/files/:ownerId', upload().array('files'), elementController.uploadFiles);
 router.post('/download/files/:fileId', elementController.downloadFile);
 router.post('/download/files', elementController.downloadFiles);
+router.post('/delete/files/:fileId', elementController.deleteFile);
 
 export default router;
