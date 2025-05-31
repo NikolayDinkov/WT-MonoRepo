@@ -20,11 +20,15 @@ const App = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
-  });
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetch('http://localhost:3000/elements/662fb8a1e9e4c7a29b123abc')
+      fetch('http://localhost:3000/elements/662fb8a1e9e4c7a29b123abc', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
         .then((response) => response.json())
         .then((res) => setMyDrive(res))
         .catch((error) => console.error(error));
