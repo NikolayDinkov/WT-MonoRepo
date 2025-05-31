@@ -1,10 +1,9 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { connectDB } from './config/database';
-import mongoose from 'mongoose';
 import router from './routes';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 connectDB()
   .then(() => {
