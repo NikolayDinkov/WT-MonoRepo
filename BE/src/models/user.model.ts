@@ -1,7 +1,7 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-const saltRounds = Number(process.env.SALTROUNDS) || 5;
+const saltRounds = Number(process.env.SALT_ROUNDS) || 12;
 
 export interface IUser extends Document {
   firstName: string;
@@ -19,6 +19,7 @@ const userSchema = new Schema<IUser>(
     username: {
       type: String,
       required: true,
+      unique: true,
       minlength: [5, 'Username should be at least 5 characters'],
       validate: {
         validator: (v: string) => /^[a-zA-Z0-9]+$/.test(v),
@@ -30,7 +31,7 @@ const userSchema = new Schema<IUser>(
     password: {
       type: String,
       required: true,
-      minlength: [5, 'Password should be at least 5 characters'],
+      minlength: [6, 'Password should be at least 6 characters'],
       validate: {
         validator: (v: string) => /^[a-zA-Z0-9]+$/.test(v),
         message: (props) =>
