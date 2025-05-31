@@ -3,6 +3,8 @@
   padding: 20px;
   border: 1px solid lightgrey;
   border-radius: 8px;
+
+  margin: auto;
 }
 
 .login-form h2 {
@@ -48,4 +50,8 @@ p a {
 
 .link-button:hover {
   color: darkblue;
+}
+
+.error-message {
+  color: red;
 }

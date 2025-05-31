@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
 import './Register.css';
-import { registerUser } from '../../LoginRegisterMock';
 
 export default function Register() {
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const [errorMessage, setErrorMessage] = useState('');
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -15,26 +19,44 @@ export default function Register() {
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
-    if (password !== confirmPassword) {
-      alert('Passwords do not match!');
-      return;
-    }
+    try {
+      const response = await axios.post('http://localhost:3000/users/signup', {
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+        confirmPassword,
+      });
 
-    const success = registerUser({
-      firstName,
-      lastName,
-      username,
-      email,
-      password,
-    });
-    if (success) {
-      window.location.href = '/';
+      if (response.status === 201) {
+        // succesful registration is alerted, could be improved
+        alert('Registration successful! You can now login.');
+        window.location.href = '/login';
+      }
+    } catch (error: any) {
+      if (error.response) {
+        const { data } = error.response;
+        //express-validator errors
+        if (Array.isArray(data.errors)) {
+          const messages = data.errors.map((err: any) => err.msg).join('\n');
+          setErrorMessage(messages);
+        } else if (data.message) {
+          //custom backend errors
+          setErrorMessage(data.message);
+        } else {
+          setErrorMessage('Unexpected error occurred during registration.');
+        }
+      } else {
+        setErrorMessage('Network error or server not reachable.');
+      }
     }
   }
 
   return (
     <form className="register-form" onSubmit={handleSubmit}>
       <h2>Register</h2>
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
       <input type="text" name="firstName" placeholder="First Name" required />
       <input type="text" name="lastName" placeholder="Last Name" required />
       <input type="text" name="username" placeholder="Username" required />

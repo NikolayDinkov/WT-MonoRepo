@@ -11,6 +11,11 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
   );
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  function handleLogout() {
+    localStorage.removeItem('token');
+    window.location.reload();
+  }
+
   const filteredElements = myDrive.filter((el) => {
     const matchesText = el.name
       .toLowerCase()
@@ -102,6 +107,9 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
           </div>
         )}
       </div>
+      <button className="exit-button" onClick={handleLogout}>
+        EXIT
+      </button>
     </div>
   );
 };
