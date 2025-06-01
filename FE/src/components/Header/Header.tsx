@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Header.css';
-import { FiSearch, FiX, FiFolder, FiFileText } from 'react-icons/fi';
+import { FiSearch, FiX, FiFolder, FiFileText, FiUser } from 'react-icons/fi';
 import { HeaderProps } from '../../interfaces/HeaderProps';
 
 const Header: React.FC<HeaderProps> = ({ myDrive }) => {
@@ -10,6 +10,7 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
     'all'
   );
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -107,9 +108,23 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
           </div>
         )}
       </div>
-      <button className="exit-button" onClick={handleLogout}>
-        EXIT
-      </button>
+      <div className="dropdown-container">
+        <button
+          className="drop-button"
+          onClick={() => setShowDropdown((prev) => !prev)}
+        >
+          <FiUser size={30}></FiUser>
+        </button>
+        {showDropdown && (
+          <>
+            <div className="dropdown-menu">
+              <button className="exit-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

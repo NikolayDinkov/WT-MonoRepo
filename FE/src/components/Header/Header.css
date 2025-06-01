@@ -124,12 +124,32 @@
   cursor: pointer;
 }
 
-.exit-button {
-  cursor: pointer;
-  padding: 10px;
-  background-color: rgb(107, 107, 185);
-  color: white;
-  border: none;
-  border-radius: 4px;
+.dropdown-container {
   margin-left: auto;
+  position: relative;
+  margin-right: 4%;
+}
+
+.drop-button {
+  cursor: pointer;
+}
+
+.exit-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 6px;
 }
