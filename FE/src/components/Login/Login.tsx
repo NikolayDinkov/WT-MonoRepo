@@ -3,7 +3,11 @@ import { Link } from 'react-router-dom';
 import './Login.css';
 import axios from 'axios';
 
-export default function Login() {
+interface LoginProps {
+  onLoginSuccess: () => void;
+}
+
+export default function Login({ onLoginSuccess }: LoginProps) {
   const [errorMessage, setErrorMessage] = useState('');
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -22,7 +26,7 @@ export default function Login() {
       if (response.status === 200) {
         const token = response.data.token;
         localStorage.setItem('token', token);
-        window.location.href = '/';
+        onLoginSuccess();
       }
     } catch (error: any) {
       if (error.response) {

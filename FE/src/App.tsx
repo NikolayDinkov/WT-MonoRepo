@@ -63,7 +63,12 @@ const App = () => {
                 path="/login"
                 element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />}
               />
-              <Route path="/register" element={<Register />} />
+              <Route
+                path="/register"
+                element={
+                  <Register onRegisterSuccess={() => setIsLoggedIn(true)} />
+                }
+              />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </>

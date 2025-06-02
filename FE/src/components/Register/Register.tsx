@@ -4,7 +4,11 @@ import axios from 'axios';
 
 import './Register.css';
 
-export default function Register() {
+interface RegisterProps {
+  onRegisterSuccess: () => void;
+}
+
+export default function Register({ onRegisterSuccess }: RegisterProps) {
   const [errorMessage, setErrorMessage] = useState('');
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -30,9 +34,11 @@ export default function Register() {
       });
 
       if (response.status === 201) {
-        // succesful registration is alerted, could be improved
-        alert('Registration successful! You can now login.');
-        window.location.href = '/login';
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+        //the alert could be removed, but since we dont have email confirmation will keep it for now
+        alert('Registration successful!');
+        onRegisterSuccess();
       }
     } catch (error: any) {
       if (error.response) {
