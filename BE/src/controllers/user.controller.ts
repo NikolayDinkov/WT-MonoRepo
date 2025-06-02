@@ -4,10 +4,11 @@ const jwt = require('jsonwebtoken');
 
 import User from '../models/user.model';
 
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (req: Request, res: Response): Promise<void> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    res.status(400).json({ errors: errors.array() });
+    return;
   }
 
   const { firstName, lastName, username, email, password } = req.body;
@@ -16,26 +17,26 @@ export const signup = async (req: Request, res: Response) => {
   try {
     existingUserByUsername = await User.findOne({ username: username });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error while registering' });
+    res.status(500).json({ message: 'Server error while registering' });
+    return;
   }
 
   if (existingUserByUsername) {
-    return res
-      .status(409)
-      .json({ message: 'User with this username already exists' });
+    res.status(409).json({ message: 'User with this username already exists' });
+    return;
   }
 
   let existingUserByEmail;
   try {
     existingUserByEmail = await User.findOne({ email: email });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error while registering' });
+    res.status(500).json({ message: 'Server error while registering' });
+    return;
   }
 
   if (existingUserByEmail) {
-    return res
-      .status(409)
-      .json({ message: 'User with this email already exists' });
+    res.status(409).json({ message: 'User with this email already exists' });
+    return;
   }
 
   const newUser = new User({
@@ -49,7 +50,8 @@ export const signup = async (req: Request, res: Response) => {
   try {
     await newUser.save();
   } catch (error) {
-    return res.status(500).json({ message: 'Error registering the user' });
+    res.status(500).json({ message: 'Error registering the user' });
+    return;
   }
 
   let token;
@@ -60,10 +62,11 @@ export const signup = async (req: Request, res: Response) => {
   res.status(201).json({ userId: newUser.id, token: token });
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    res.status(400).json({ errors: errors.array() });
+    return;
   }
 
   const { username, password } = req.body;
@@ -73,11 +76,13 @@ export const login = async (req: Request, res: Response) => {
   try {
     existingUser = await User.findOne({ username: username });
   } catch (error) {
-    return res.status(401).json({ message: 'Error logging in the user' });
+    res.status(401).json({ message: 'Error logging in the user' });
+    return;
   }
 
   if (!existingUser) {
-    return res.status(401).json({ message: 'Invalid username or password' });
+    res.status(401).json({ message: 'Invalid username or password' });
+    return;
   }
 
   let isValidPassword;
@@ -85,11 +90,13 @@ export const login = async (req: Request, res: Response) => {
   try {
     isValidPassword = await existingUser?.matchPassword(password);
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid username or password' });
+    res.status(401).json({ message: 'Invalid username or password' });
+    return;
   }
 
   if (!isValidPassword) {
-    return res.status(401).json({ message: 'Invalid username or password' });
+    res.status(401).json({ message: 'Invalid username or password' });
+    return;
   }
 
   let token;

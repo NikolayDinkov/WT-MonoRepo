@@ -10,8 +10,7 @@ export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
     if (!token) {
       throw new Error('Authentication failed!');
     }
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-    req.userData = { userId: decodedToken.userId };
+    jwt.verify(token, process.env.SECRET_KEY); //will throw error will the token is invalid
     next();
   } catch (err) {
     return res.status(403).json({ message: 'Authentication failed!' });
