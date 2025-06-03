@@ -1,5 +1,5 @@
-import { Types } from 'mongoose';
 import Element, { IElement } from '../models/element.model';
+import { Types } from 'mongoose';
 
 export const getSharedElementsForUser = (userId: Types.ObjectId) => {
   return Element.find({ sharedWith: userId }).lean().exec();
