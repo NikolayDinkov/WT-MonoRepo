@@ -3,6 +3,8 @@
   padding: 20px;
   border: 1px solid lightgrey;
   border-radius: 8px;
+
+  margin: auto;
 }
 
 .register-form h2 {
@@ -37,4 +39,8 @@ p a {
 
 .register-form button:hover {
   background-color: darkblue;
+}
+
+.error-message {
+  color: red;
 }
