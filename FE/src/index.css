@@ -1,4 +1,3 @@
-/* index.css */
 * {
   margin: 0;
   padding: 0;
@@ -10,10 +9,25 @@ body,
 #root {
   height: 100%;
   width: 100%;
+
+  --primary-text-color: rgb(31, 31, 31);
+  --error-text-color: #b3261e;
+  --auth-buttons-and-links-color: #0b57d0;
+  --auth-buttons-and-links-color-hover: #0e4eb5;
+  --file-property-color: rgb(68, 71, 70);
+  --search-bar-bg-color: rgb(233, 238, 246);
+
+  --font-main: 'Google Sans Text', 'Google Sans', Roboto, Arial;
+
+  --font-size-heading: 24px;
+  --font-size-sidebar: 14px;
+  --font-size-element: 15px;
 }
 
 body {
-  font-family: 'Google Sans', 'Roboto', sans-serif;
+  font-family: var(--font-main);
+  color: var(--primary-text-color);
+
   background-color: #f1f3f4;
   overflow: hidden;
 }
