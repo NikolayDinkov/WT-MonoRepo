@@ -8,7 +8,7 @@ import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Header/Header';
 import MainContent from './components/MainContent/MainContent';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { Element } from './interfaces/Element';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
@@ -16,6 +16,7 @@ import Register from './components/Register/Register';
 const App = () => {
   const [myDrive, setMyDrive] = useState<Element[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [sharedWithMe, setSharedWithMe] = useState<Element[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,6 +36,19 @@ const App = () => {
     }
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetch('http://localhost:3000/elements/662fb8a1e9e4c7a29b123abc', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((res) => setSharedWithMe(res))
+        .catch((error) => console.error(error));
+    }
+  }, [isLoggedIn]);
+
   return (
     <Router>
       <div className="app">
@@ -49,8 +63,8 @@ const App = () => {
                   element={<MainContent page="myDrive" myDrive={myDrive} />}
                 />
                 <Route
-                  path="/shared-with-me"
-                  element={<MainContent page="shared" myDrive={myDrive} />}
+                  path="/shared-with-me/:directoryId?"
+                  element={<MainContent page="shared" myDrive={sharedWithMe} />}
                 />
                 <Route path="*" element={<Navigate to="/my-drive" replace />} />
               </Routes>

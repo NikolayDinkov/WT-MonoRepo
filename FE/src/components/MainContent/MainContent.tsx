@@ -24,7 +24,13 @@ const MainContent: React.FC<MainContentProps> = ({ page, myDrive }) => {
   );
 
   const handleDirectoryClick = (directory: Directory) => {
-    navigate(`/my-drive/${directory._id}`); // Navigate to the clicked directory
+    if (page == 'myDrive') {
+      // Only navigate if the page is 'myDrive'
+      navigate(`/my-drive/${directory._id}`);
+    } // Navigate to the clicked directory
+    if (page === 'shared') {
+      navigate(`/shared/${directory._id}`); // Navigate to the clicked directory in shared
+    }
   };
 
   return (
@@ -38,7 +44,15 @@ const MainContent: React.FC<MainContentProps> = ({ page, myDrive }) => {
           />
         </>
       )}
-      {page === 'shared' && <h1>Споделено с мен</h1>}
+      {page === 'shared' && (
+        <>
+          <FileList
+            directories={directories}
+            files={files}
+            onDirectoryClick={handleDirectoryClick}
+          />
+        </>
+      )}
     </div>
   );
 };
