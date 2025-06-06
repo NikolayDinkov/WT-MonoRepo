@@ -1,0 +1,74 @@
+.create-button-wrapper {
+  position: relative;
+  display: inline-block;
+
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.create-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 18px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #202124;
+  cursor: pointer;
+  box-shadow:
+    0 1px 3px rgba(60, 64, 67, 0.3),
+    0 4px 8px rgba(60, 64, 67, 0.15);
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s;
+  margin: 12px 0 24px 0;
+}
+
+.create-button:hover {
+  background-color: #f1f3f4;
+}
+
+.icon {
+  font-size: 14px;
+}
+
+.dropdown-menu {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+  cursor: pointer;
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.3),
+    0 2px 6px rgba(60, 64, 67, 0.15);
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f3f4;
+}
+
+.dropdown-icon {
+  font-size: 16px;
+}

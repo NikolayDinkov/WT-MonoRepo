@@ -1,6 +1,7 @@
 import './Sidebar.css';
 import { FaHdd, FaUsers } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
+import CreateButton from '../CreateButton/CreateButton';
 
 const Sidebar = () => {
   return (
@@ -9,6 +10,8 @@ const Sidebar = () => {
         <img src="assets/google-drive-icon.png" alt="Logo" />
         <span className="sidebar-title">Диск</span>
       </NavLink>
+
+      <CreateButton></CreateButton>
 
       <div className="sidebar-buttons">
         <NavLink
