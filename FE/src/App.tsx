@@ -8,32 +8,14 @@ import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Header/Header';
 import MainContent from './components/MainContent/MainContent';
-import { useEffect, useState } from 'react';
-import { Element } from './interfaces/Element';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
+import { useAuth } from './contexts/authContext';
+import { useFileContext } from './contexts/fileContext';
 
 const App = () => {
-  const [myDrive, setMyDrive] = useState<Element[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetch('http://localhost:3000/elements/662fb8a1e9e4c7a29b123abc', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((res) => setMyDrive(res))
-        .catch((error) => console.error(error));
-    }
-  }, [isLoggedIn]);
+  const { isLoggedIn } = useAuth();
+  const { myDrive } = useFileContext();
 
   return (
     <Router>
@@ -57,21 +39,11 @@ const App = () => {
             </div>
           </>
         ) : (
-          <>
-            <Routes>
-              <Route
-                path="/login"
-                element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />}
-              />
-              <Route
-                path="/register"
-                element={
-                  <Register onRegisterSuccess={() => setIsLoggedIn(true)} />
-                }
-              />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
-          </>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
         )}
       </div>
     </Router>

@@ -22,7 +22,11 @@
 }
 
 .sidebar-title {
+<<<<<<< HEAD
   font-size: var(--font-size-sidebar-heading);
+=======
+  font-size: var(--font-size-heading);
+>>>>>>> origin/main
   font-weight: 500;
   color: var(--primary-text-color);
 }

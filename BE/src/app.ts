@@ -10,13 +10,25 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://wt-monorepo-fe.onrender.com',
+];
+
 app.use(express.json());
 app.use(
   cors({
-    origin: 'http://localhost:5173', // allow frontend Vite app
-    credentials: true, // allow cookies if needed
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
   })
 );
+
 app.use('/', router);
 
 app.listen(PORT, () => {

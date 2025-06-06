@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { upload } from '../utils/upload';
 
 import elementController from '../controllers/element.controller';
-import { checkAuth } from '../middleware/auth'; //must be used on protected routes
 
 const router = Router();
 
