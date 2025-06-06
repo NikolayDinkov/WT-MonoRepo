@@ -19,11 +19,7 @@ body,
 
   --font-main: 'Google Sans Text', 'Google Sans', Roboto, Arial;
 
-<<<<<<< HEAD
-  --font-size-sidebar-heading: 22px;
-=======
   --font-size-heading: 24px;
->>>>>>> origin/main
   --font-size-sidebar: 14px;
   --font-size-element: 15px;
 }
