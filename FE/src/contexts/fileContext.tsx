@@ -33,12 +33,11 @@ export function FileProvider({ children }: { children: ReactNode }) {
     } else {
       setMyDrive([]);
     }
-  };
+  }, [isLoggedIn, userId]);
 
   useEffect(() => {
     reloadFiles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, userId]);
+  }, [reloadFiles]);
 
   return (
     <FileContext.Provider value={{ myDrive, setMyDrive, reloadFiles }}>
