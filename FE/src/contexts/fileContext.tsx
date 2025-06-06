@@ -33,7 +33,7 @@ export function FileProvider({ children }: { children: ReactNode }) {
     } else {
       setMyDrive([]);
     }
-  }, [isLoggedIn, userId]);
+  };
 
   useEffect(() => {
     reloadFiles();
