@@ -5,10 +5,10 @@ import { NavLink } from 'react-router-dom';
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
+      <NavLink to="/" className="sidebar-header">
         <img src="assets/google-drive-icon.png" alt="Logo" />
         <span className="sidebar-title">Диск</span>
-      </div>
+      </NavLink>
 
       <div className="sidebar-buttons">
         <NavLink
