@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+
+import { useAuth } from '../../contexts/authContext';
 
 import './Register.css';
 
-interface RegisterProps {
-  onRegisterSuccess: () => void;
-}
-
-export default function Register({ onRegisterSuccess }: RegisterProps) {
+export default function Register() {
   const [errorMessage, setErrorMessage] = useState('');
+  const { register } = useAuth();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,43 +21,19 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
-    try {
-      const response = await axios.post(
-        'https://wt-monorepo.onrender.com/users/signup',
-        {
-          firstName,
-          lastName,
-          username,
-          email,
-          password,
-          confirmPassword,
-        }
-      );
-
-      if (response.status === 201) {
-        const token = response.data.token;
-        localStorage.setItem('token', token);
-        //the alert could be removed, but since we dont have email confirmation will keep it for now
-        alert('Registration successful!');
-        onRegisterSuccess();
-      }
-    } catch (error: any) {
-      if (error.response) {
-        const { data } = error.response;
-        //express-validator errors
-        if (Array.isArray(data.errors)) {
-          const messages = data.errors.map((err: any) => err.msg).join('\n');
-          setErrorMessage(messages);
-        } else if (data.message) {
-          //custom backend errors
-          setErrorMessage(data.message);
-        } else {
-          setErrorMessage('Unexpected error occurred during registration.');
-        }
-      } else {
-        setErrorMessage('Network error or server not reachable.');
-      }
+    const result = await register({
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      confirmPassword,
+    });
+    if (!result.success) {
+      setErrorMessage(result.errorMessage || 'Registration failed.');
+      return;
     }
+    // On success, context will update and redirect handled by App
   }
 
   return (
