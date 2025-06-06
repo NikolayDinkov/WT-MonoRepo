@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Login.css';
-import axios from 'axios';
+import { useAuth } from '../../contexts/authContext';
 
-interface LoginProps {
-  onLoginSuccess: () => void;
-}
-
-export default function Login({ onLoginSuccess }: LoginProps) {
+export default function Login() {
   const [errorMessage, setErrorMessage] = useState('');
+  const { login } = useAuth();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -17,36 +14,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
 
-    try {
-      const response = await axios.post(
-        'https://wt-monorepo.onrender.com/users/login',
-        {
-          username,
-          password,
-        }
-      );
-
-      if (response.status === 200) {
-        const token = response.data.token;
-        localStorage.setItem('token', token);
-        onLoginSuccess();
-      }
-    } catch (error: any) {
-      if (error.response) {
-        const { data } = error.response;
-
-        if (Array.isArray(data.errors)) {
-          const messages = data.errors.map((err: any) => err.msg).join('\n');
-          setErrorMessage(messages);
-        } else if (data.message) {
-          setErrorMessage(data.message);
-        } else {
-          setErrorMessage('Login failed: Unexpected server response.');
-        }
-      } else {
-        setErrorMessage('Login failed: Network error or server unavailable.');
-      }
+    const result = await login({ username, password });
+    if (!result.success) {
+      setErrorMessage(result.errorMessage || 'Login failed.');
     }
+    // On success, context will update and redirect handled by App
   }
 
   return (
