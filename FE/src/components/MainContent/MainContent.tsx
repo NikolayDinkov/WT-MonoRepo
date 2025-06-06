@@ -3,15 +3,15 @@ import './MainContent.css';
 import { Directory, File } from '../../interfaces/Element';
 import FileList from '../FileList/FileList';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Element } from '../../interfaces/Element';
+import { useFileContext } from '../../contexts/fileContext';
 
 interface MainContentProps {
   page: string;
-  myDrive: Element[];
 }
 
-const MainContent: React.FC<MainContentProps> = ({ page, myDrive }) => {
+const MainContent: React.FC<MainContentProps> = ({ page }) => {
   const { directoryId } = useParams<{ directoryId: string }>();
+  const { myDrive } = useFileContext();
   const currentPath: string | null = directoryId || null;
   const navigate = useNavigate();
 
