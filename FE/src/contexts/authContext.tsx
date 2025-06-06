@@ -4,7 +4,6 @@ import {
   useState,
   useEffect,
   ReactNode,
-  createElement,
 } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import JwtPayload from '../interfaces/JwtPayload';
@@ -83,12 +82,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    // @ts-ignore
-    createElement(
-      AuthContext.Provider,
-      { value: { isLoggedIn, userId, login, register, logout } },
-      children
-    )
+    <AuthContext.Provider
+      value={{ isLoggedIn, userId, login, register, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 }
 
