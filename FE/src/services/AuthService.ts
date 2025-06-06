@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL =
-  `${import.meta.env.VITE_API_URL}/users` || 'http://localhost:3000/users';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/users`;
 
 export interface LoginPayload {
   username: string;

@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { Element } from '../interfaces/Element';
 
-const API_BASE_URL =
-  `${import.meta.env.VITE_API_URL}/elements` ||
-  'http://localhost:3000/elements';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/elements`;
 
 export const FileService = {
   async getUserElements(userId: string): Promise<Element[]> {
