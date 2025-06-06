@@ -18,10 +18,13 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     const password = formData.get('password') as string;
 
     try {
-      const response = await axios.post('http://localhost:3000/users/login', {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        'https://wt-monorepo.onrender.com/users/login',
+        {
+          username,
+          password,
+        }
+      );
 
       if (response.status === 200) {
         const token = response.data.token;

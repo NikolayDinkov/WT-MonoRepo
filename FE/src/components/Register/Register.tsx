@@ -24,14 +24,17 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
     const confirmPassword = formData.get('confirmPassword') as string;
 
     try {
-      const response = await axios.post('http://localhost:3000/users/signup', {
-        firstName,
-        lastName,
-        username,
-        email,
-        password,
-        confirmPassword,
-      });
+      const response = await axios.post(
+        'https://wt-monorepo.onrender.com/users/signup',
+        {
+          firstName,
+          lastName,
+          username,
+          email,
+          password,
+          confirmPassword,
+        }
+      );
 
       if (response.status === 201) {
         const token = response.data.token;

@@ -39,7 +39,7 @@ const App = () => {
 
   useEffect(() => {
     if (isLoggedIn && userId) {
-      fetch(`http://localhost:3000/elements/${userId}`, {
+      fetch(`https://wt-monorepo.onrender.com/elements/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
