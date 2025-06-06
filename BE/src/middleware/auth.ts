@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 const jwt = require('jsonwebtoken');
 
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
 export const checkAuth = (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): void => {
@@ -15,7 +19,8 @@ export const checkAuth = (
     if (!token) {
       throw new Error('Authentication failed!');
     }
-    jwt.verify(token, process.env.SECRET_KEY); //will throw error will the token is invalid
+    const decoded = jwt.verify(token, process.env.SECRET_KEY); //will throw error will the token is invalid
+    req.userId = decoded.id; // passes the id to the next middleware
     next();
   } catch (err) {
     res.status(403).json({ message: 'Authentication failed!' });
