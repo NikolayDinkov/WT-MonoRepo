@@ -1,17 +1,17 @@
 import './Sidebar.css';
 import { FaHdd, FaUsers } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
+import CreateButton from '../CreateButton/CreateButton';
 
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
-        <img
-          src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png"
-          alt="Logo"
-        />
+      <NavLink to="/" className="sidebar-header">
+        <img src="assets/google-drive-icon.png" alt="Logo" />
         <span className="sidebar-title">Диск</span>
-      </div>
+      </NavLink>
+
+      <CreateButton></CreateButton>
 
       <div className="sidebar-buttons">
         <NavLink

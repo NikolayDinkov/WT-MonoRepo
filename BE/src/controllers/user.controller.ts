@@ -15,6 +15,14 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     const result = await signupUser(req.body);
     res.status(201).json(result);
   } catch (error: any) {
+    if (error.name === 'ValidationError') {
+      //remove the title from the error thrown by mongoose, showing only the custom message
+      const messages = Object.values(error.errors).map((e: any) => e.message);
+      res.status(400).json({
+        errors: messages.map((msg) => ({ msg })),
+      });
+      return;
+    }
     res
       .status(error.status || 500)
       .json({ message: error.message || 'Server error while registering' });

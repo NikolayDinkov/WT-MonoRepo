@@ -23,19 +23,19 @@ const userSchema = new Schema<IUser>(
       minlength: [5, 'Username should be at least 5 characters'],
       validate: {
         validator: (v: string) => /^[a-zA-Z0-9]+$/.test(v),
-        message: (props) =>
-          `${props.value} must contain only Latin letters and digits.`,
+        message: () => 'Username must contain only Latin letters and digits.',
       },
     },
     email: { type: String, required: true, unique: true },
     password: {
       type: String,
       required: true,
-      minlength: [6, 'Password should be at least 6 characters'],
+      minlength: [6, 'Password must be at least 6 characters. '],
       validate: {
-        validator: (v: string) => /^[a-zA-Z0-9]+$/.test(v),
-        message: (props) =>
-          `${props.value} must contain only Latin letters and digits.`,
+        validator: (v: string) =>
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{6,}$/.test(v),
+        message: () =>
+          'Password must include at least one uppercase letter, one lowercase letter, and one special character. ',
       },
     },
   },

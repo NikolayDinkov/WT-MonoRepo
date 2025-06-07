@@ -1,16 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Header.css';
 import { FiSearch, FiX, FiFolder, FiFileText, FiUser } from 'react-icons/fi';
-import { HeaderProps } from '../../interfaces/HeaderProps';
+import { useFileContext } from '../../contexts/fileContext';
 
-const Header: React.FC<HeaderProps> = ({ myDrive }) => {
+const Header: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'folder' | 'file'>(
     'all'
   );
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const { myDrive } = useFileContext();
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -32,6 +34,12 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
         !wrapperRef.current.contains(event.target as Node)
       ) {
         setShowResults(false);
+      }
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
       }
     }
 
@@ -108,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({ myDrive }) => {
           </div>
         )}
       </div>
-      <div className="dropdown-container">
+      <div className="dropdown-container" ref={dropdownRef}>
         <button
           className="drop-button"
           onClick={() => setShowDropdown((prev) => !prev)}

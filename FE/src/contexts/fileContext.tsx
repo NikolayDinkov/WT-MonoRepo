@@ -28,7 +28,7 @@ export function FileProvider({ children }: { children: ReactNode }) {
         setMyDrive(files);
       } catch (error) {
         setMyDrive([]);
-        // Optionally handle error
+        console.error('Failed to load files:', error);
       }
     } else {
       setMyDrive([]);
@@ -37,7 +37,7 @@ export function FileProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     reloadFiles();
-  }, [reloadFiles]);
+  }, [isLoggedIn, userId]);
 
   return (
     <FileContext.Provider value={{ myDrive, setMyDrive, reloadFiles }}>
