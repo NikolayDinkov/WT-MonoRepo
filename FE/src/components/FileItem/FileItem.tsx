@@ -7,6 +7,7 @@ import { FaFileAlt } from 'react-icons/fa';
 interface FileItemProps {
   file: File;
   isMyFile: boolean;
+  key: string;
 }
 
 const FileItem: React.FC<FileItemProps> = ({ file, isMyFile: isMyFile }) => {
@@ -16,7 +17,10 @@ const FileItem: React.FC<FileItemProps> = ({ file, isMyFile: isMyFile }) => {
         <FaFileAlt className="item-icon file" />
         <span className="item-name">{file.name}</span>
       </div>
-      <ElementButtons onlyInfo={!isMyFile}></ElementButtons>
+      <ElementButtons
+        onlyInfo={!isMyFile}
+        elementId={file._id}
+      ></ElementButtons>
     </div>
   );
 };

@@ -1,15 +1,48 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
 import './ElementButtons.css';
+import getAuthToken from '../../services/AuthService';
+import { ElementButtonsProps } from '../../interfaces/Element';
+import axios from 'axios';
 
-export default function ElementButtons({ onlyInfo = false }) {
+export default function ElementButtons({
+  onlyInfo = false,
+  elementId,
+}: ElementButtonsProps) {
   const [popupType, setPopupType] = useState<
     null | 'info' | 'share' | 'delete'
   >(null);
 
+  const [metaData, setMetadata] = useState<any>(null);
+
   const closePopup = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
+    setMetadata(null);
     setPopupType(null);
+  };
+
+  const loadMetadata = async () => {
+    if (!elementId) {
+      console.log(elementId);
+      alert('Грешка при зареждане на мета информация1.');
+      return;
+    }
+    const token = getAuthToken();
+    try {
+      const response = await axios.get(`/elements/metadata/${elementId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMetadata(response.data);
+      console.log('Meta data:', response.data);
+    } catch (err: any) {
+      alert('Грешка при зареждане на мета информация');
+      console.error(
+        'Error loading metadata:',
+        err?.response?.data || err.message
+      );
+    }
   };
 
   return (
@@ -20,6 +53,7 @@ export default function ElementButtons({ onlyInfo = false }) {
           onClick={(e) => {
             e.stopPropagation();
             setPopupType('info');
+            loadMetadata();
           }}
         >
           <FaInfoCircle />
@@ -53,7 +87,17 @@ export default function ElementButtons({ onlyInfo = false }) {
         <>
           <div className="overlay" onClick={closePopup} />
           <div className="popup-centered">
-            {popupType === 'info' && <h3>Информация за файла</h3>}
+            {popupType === 'info' && (
+              <>
+                {metaData ? (
+                  <pre className="meta-info-box">
+                    {JSON.stringify(metaData, null, 2)}
+                  </pre>
+                ) : (
+                  <p>Зареждане...</p>
+                )}
+              </>
+            )}
             {popupType === 'share' && !onlyInfo && (
               <>
                 <h3>Споделяне на файла</h3>

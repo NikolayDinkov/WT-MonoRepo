@@ -4,14 +4,9 @@ import {
   Element,
   UploadFilesPayload,
 } from '../interfaces/Element';
+import getAuthToken from './AuthService';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_URL}/elements`;
-
-function getAuthToken() {
-  const token = localStorage.getItem('token');
-  if (!token) throw new Error('No auth token found');
-  return token;
-}
 
 export const FileService = {
   async getUserElements(): Promise<Element[]> {

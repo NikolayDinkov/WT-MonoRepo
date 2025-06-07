@@ -91,3 +91,9 @@ export const AuthService = {
     }
   },
 };
+
+export default function getAuthToken() {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No auth token found');
+  return token;
+}
