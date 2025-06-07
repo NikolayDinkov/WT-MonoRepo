@@ -21,7 +21,10 @@ const DirectoryItem: React.FC<DirectoryItemProps> = ({
         <FaFolder />
         <span className="item-name">{directory.name}</span>
       </div>
-      <ElementButtons onlyInfo={!isMyFile}></ElementButtons>
+      <ElementButtons
+        elementType="directory"
+        section={isMyFile ? 'my-drive' : 'shared-with-me'}
+      ></ElementButtons>
     </div>
   );
 };

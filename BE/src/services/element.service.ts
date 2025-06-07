@@ -145,7 +145,10 @@ export const deleteElementByGridFsId = (gridFsId: Types.ObjectId) => {
   return Element.deleteOne({ gridFsId }).exec();
 };
 
-export const deleteElementById = async (elementId: Types.ObjectId, ownerId: Types.ObjectId): Promise<void> => {
+export const deleteElementById = async (
+  elementId: Types.ObjectId,
+  ownerId: Types.ObjectId
+): Promise<void> => {
   const element = await Element.findById(elementId).exec();
   if (!element) {
     throw new Error('Element not found');
