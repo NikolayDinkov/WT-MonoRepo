@@ -136,7 +136,7 @@ const uploadFiles = async (
 const downloadFile = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { stream, file } = await FileService.downloadFileById(
-      req.params.fileId
+      req.params.elementId
     );
     res.set('Content-Type', file.contentType);
     res.set('Content-Disposition', `attachment; filename=${file.filename}`);

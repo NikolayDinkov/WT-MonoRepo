@@ -1,9 +1,41 @@
 import { useState } from 'react';
-import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
+import { FaDownload, FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
 import './ElementButtons.css';
 import { ElementButtonsProps } from '../../interfaces/Element';
-import { deleteElement, loadMetadata } from '../../services/FileService';
+import {
+  deleteElement,
+  loadMetadata,
+  downloadFile,
+} from '../../services/FileService';
 import { useFileContext } from '../../contexts/fileContext';
+
+function handleDownload(
+  e: React.MouseEvent<HTMLButtonElement>,
+  elementId: string,
+  metaData: any
+) {
+  e.stopPropagation();
+  // async функция, използвай Promise
+  downloadFile(elementId)
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+
+      // Ако имаш metadata, използвай името, иначе 'file'
+      const filename = metaData?.filename || 'file';
+
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => {
+      alert('Грешка при тегленето на файла');
+      console.error(error);
+    });
+}
 
 export default function ElementButtons({
   elementId,
@@ -41,17 +73,27 @@ export default function ElementButtons({
     <>
       <div className="element-buttons">
         {elementType === 'file' && (
-          <button
-            className="info-element-button"
-            onClick={async (e) => {
-              e.stopPropagation();
-              setPopupType('info');
-              const data = await loadMetadata(elementId);
-              setMetadata(data);
-            }}
-          >
-            <FaInfoCircle />
-          </button>
+          <>
+            <button
+              className="download-element-button"
+              onClick={(e) => handleDownload(e, elementId, metaData)}
+              title="Тегли файла"
+            >
+              <FaDownload />
+            </button>
+
+            <button
+              className="info-element-button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                setPopupType('info');
+                const data = await loadMetadata(elementId);
+                setMetadata(data);
+              }}
+            >
+              <FaInfoCircle />
+            </button>
+          </>
         )}
 
         {section === 'my-drive' && (
