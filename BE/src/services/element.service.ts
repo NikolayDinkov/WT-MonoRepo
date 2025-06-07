@@ -1,11 +1,12 @@
 import Element, { IElement } from '../models/element.model';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { getGridFSBucket } from '../config/database';
 
-import { getFileMetadataById, getFilesByIds, renameFileById } from './file.service';
+import { getFileMetadataById, getFilesByIds, renameFileById, downloadFileById } from './file.service';
 import { CreateDirectoryInput } from '../interfaces/createDirectoryInput';
 
 export const getAllElementsForOwner = (userId: Types.ObjectId) => {
+  
   return Element.find({ owner: userId }).lean().exec();
 };
 
@@ -300,6 +301,29 @@ export const uploadFilesForOwner = async (
 
   return elements;
 };
+
+export const getFileStreamById = async (
+  elementId: Types.ObjectId,
+  userId: Types.ObjectId
+): Promise<{ stream: any; file: any }> => {
+  const element = await Element
+    .findById(elementId)
+    .lean()
+    .exec();
+  if (!element) {
+    throw new Error('Element not found');
+  }
+
+  if (!checkIfFileIsSharedWithUser(userId, elementId)) {
+    throw new Error('You do not have permission to access this element');
+  }
+
+  if (element.type !== 'file' || !element.gridFsId) {
+    throw new Error('Element is not a file or does not have a GridFS ID');
+  }
+
+  return downloadFileById(element.gridFsId);
+}
 
 export const renameElementById = async (
   elementId: Types.ObjectId,

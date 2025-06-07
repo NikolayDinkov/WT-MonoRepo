@@ -102,10 +102,10 @@ export const deleteElement = async (elementId: string): Promise<void> => {
   );
 };
 
-export async function downloadFile(fileId: string): Promise<Blob> {
+export async function downloadFile(elementId: string): Promise<Blob> {
   const token = getAuthToken();
   const response = await axios.post(
-    `${API_BASE_URL}/download/file/6844a60dcd9e54e27e68f666`,
+    `${API_BASE_URL}/download/file/${elementId}`,
     {
       responseType: 'blob',
     },

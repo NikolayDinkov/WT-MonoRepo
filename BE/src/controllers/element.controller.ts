@@ -164,10 +164,19 @@ const shareElementWithUser = async (
   }
 }
 
-const downloadFile = async (req: AuthenticatedRequest, res: Response) => {
+const downloadFile = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
-    const { stream, file } = await FileService
-      .downloadFileById(req.params.fileId);
+    const {stream, file} = await ElementService.getFileStreamById(
+      new Types.ObjectId(req.params.elementId),
+      new Types.ObjectId(req.userId)
+    );
+    if (!stream || !file) {
+      res.status(404).json({ error: 'File not found' });
+      return;
+    }
 
     res.set('Content-Type', file.contentType);
     res.set('Content-Disposition', `attachment; filename=${file.filename}`);
