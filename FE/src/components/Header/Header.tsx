@@ -7,7 +7,7 @@ import { useFileContext } from '../../contexts/fileContext';
 const Header: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [filterType, setFilterType] = useState<'all' | 'folder' | 'file'>(
+  const [filterType, setFilterType] = useState<'all' | 'directory' | 'file'>(
     'all'
   );
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -80,11 +80,11 @@ const Header: React.FC = () => {
                 id="type-select"
                 value={filterType}
                 onChange={(e) =>
-                  setFilterType(e.target.value as 'all' | 'folder' | 'file')
+                  setFilterType(e.target.value as 'all' | 'directory' | 'file')
                 }
               >
                 <option value="all">Всичко</option>
-                <option value="folder">Директории</option>
+                <option value="directory">Директории</option>
                 <option value="file">Файлове</option>
               </select>
             </div>
