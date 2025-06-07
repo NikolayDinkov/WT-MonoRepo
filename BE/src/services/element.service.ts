@@ -1,24 +1,22 @@
 import Element, { IElement } from '../models/element.model';
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { getGridFSBucket } from '../config/database';
 
 import { getFileMetadataById, getFilesByIds, renameFileById, downloadFileById } from './file.service';
 import { CreateDirectoryInput } from '../interfaces/createDirectoryInput';
 
 export const getAllElementsForOwner = (userId: Types.ObjectId) => {
-  
   return Element.find({ owner: userId }).lean().exec();
 };
 
-export async function getAllSharedElementsForUser(userId: Types.ObjectId) {
+export const getAllSharedElementsForUser = async (userId: Types.ObjectId) => {
   const rootDirs = await Element.find({ sharedWith: { $in: [userId] } })
     .lean()
     .exec();
 
-    // Make an array and get every element below the root directories
-  const allSharedElements: IElement[] = [];
+  const allSharedElements: IElement[] = [rootDirs].flat();
   for (const root of rootDirs) {
-    await collectSharedElementsRecursively(root.id, allSharedElements, userId);
+    await collectSharedElementsRecursively(root._id as Types.ObjectId, allSharedElements, userId);
   }
   return allSharedElements;
 }
@@ -31,9 +29,8 @@ async function collectSharedElementsRecursively(
   const children = await Element.find({ parent: parentId }).lean().exec();
 
   for (const child of children) {
-    if (child.sharedWith.includes(userId)) {
-      result.push(child);
-    }
+    result.push(child);
+
     if (child.type === 'directory') {
       await collectSharedElementsRecursively(child.id, result, userId);
     }
@@ -270,7 +267,7 @@ export const uploadFilesForOwner = async (
   parentId: Types.ObjectId | null
 ) => {
   let parentPath = '';
-  console.log(parentId);
+  
   if (parentId) {
     const parentElement = await Element.findById(parentId).lean().exec();
     if (!parentElement || parentElement.type !== 'directory') {
