@@ -68,3 +68,22 @@ export const FileService = {
     return response.data.elements || response.data;
   },
 };
+
+export const loadMetadata = async (elementId: string): Promise<any> => {
+  if (!elementId) {
+    alert('Грешка при зареждане на мета информация: няма елемент');
+    return null;
+  }
+  const token = getAuthToken();
+  try {
+    const response = await axios.get(`${API_BASE_URL}/metadata/${elementId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (err: any) {
+    alert('Грешка при зареждане на мета информация');
+    return null;
+  }
+};

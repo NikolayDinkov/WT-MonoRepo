@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
 import './ElementButtons.css';
-import getAuthToken from '../../services/AuthService';
 import { ElementButtonsProps } from '../../interfaces/Element';
-import axios from 'axios';
+
+import { loadMetadata } from '../../services/FileService';
 
 export default function ElementButtons({
-  onlyInfo = false,
   elementId,
   elementType,
   section,
@@ -23,40 +22,17 @@ export default function ElementButtons({
     setPopupType(null);
   };
 
-  const loadMetadata = async () => {
-    if (!elementId) {
-      console.log(elementId);
-      alert('Грешка при зареждане на мета информация1.');
-      return;
-    }
-    const token = getAuthToken();
-    try {
-      const response = await axios.get(`/elements/metadata/${elementId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setMetadata(response.data);
-      console.log('Meta data:', response.data);
-    } catch (err: any) {
-      alert('Грешка при зареждане на мета информация');
-      console.error(
-        'Error loading metadata:',
-        err?.response?.data || err.message
-      );
-    }
-  };
-
   return (
     <>
       <div className="element-buttons">
         {elementType === 'file' && (
           <button
             className="info-element-button"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               setPopupType('info');
-              loadMetadata();
+              const data = await loadMetadata(elementId);
+              setMetadata(data);
             }}
           >
             <FaInfoCircle />
@@ -94,7 +70,31 @@ export default function ElementButtons({
         <>
           <div className="overlay" onClick={closePopup} />
           <div className="popup-centered">
-            {popupType === 'info' && <h3>Информация за файла</h3>}
+            {popupType === 'info' && (
+              <>
+                {metaData ? (
+                  <div className="meta-info-details">
+                    <p>
+                      <strong>Име:</strong> {metaData.filename || 'Няма данни'}
+                    </p>
+                    <p>
+                      <strong>Размер:</strong>{' '}
+                      {metaData.chunkSize
+                        ? `${(metaData.chunkSize / 1024 / 1024).toFixed(2)} MB`
+                        : 'Няма данни'}
+                    </p>
+                    <p>
+                      <strong>Създаден на:</strong>{' '}
+                      {metaData.uploadDate
+                        ? new Date(metaData.uploadDate).toLocaleString()
+                        : 'Няма данни'}
+                    </p>
+                  </div>
+                ) : (
+                  <p>Зареждане...</p>
+                )}
+              </>
+            )}
             {popupType === 'share' &&
               section === 'my-drive' &&
               elementType === 'directory' && (
