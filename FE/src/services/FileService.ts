@@ -4,14 +4,9 @@ import {
   Element,
   UploadFilesPayload,
 } from '../interfaces/Element';
+import getAuthToken from './AuthService';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_URL}/elements`;
-
-function getAuthToken() {
-  const token = localStorage.getItem('token');
-  if (!token) throw new Error('No auth token found');
-  return token;
-}
 
 export const FileService = {
   async getUserElements(): Promise<Element[]> {
@@ -72,4 +67,23 @@ export const FileService = {
     // The backend returns { message, elements }, so return elements array
     return response.data.elements || response.data;
   },
+};
+
+export const loadMetadata = async (elementId: string): Promise<any> => {
+  if (!elementId) {
+    alert('Грешка при зареждане на мета информация: няма елемент');
+    return null;
+  }
+  const token = getAuthToken();
+  try {
+    const response = await axios.get(`${API_BASE_URL}/metadata/${elementId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (err: any) {
+    alert('Грешка при зареждане на мета информация');
+    return null;
+  }
 };

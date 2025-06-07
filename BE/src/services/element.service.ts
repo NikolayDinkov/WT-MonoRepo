@@ -64,7 +64,7 @@ async function collectFilesRecursively(
     if (child.type === 'file') {
       result.push(child);
     } else if (child.type === 'directory') {
-      await collectFilesRecursively(new child.id(), result);
+      await collectFilesRecursively(new Types.ObjectId(child.id), result);
     }
   }
 }

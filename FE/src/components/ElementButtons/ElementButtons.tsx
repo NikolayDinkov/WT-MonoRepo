@@ -3,7 +3,10 @@ import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
 import './ElementButtons.css';
 import { ElementButtonsProps } from '../../interfaces/Element';
 
+import { loadMetadata } from '../../services/FileService';
+
 export default function ElementButtons({
+  elementId,
   elementType,
   section,
 }: ElementButtonsProps) {
@@ -11,8 +14,11 @@ export default function ElementButtons({
     null | 'info' | 'share' | 'delete'
   >(null);
 
+  const [metaData, setMetadata] = useState<any>(null);
+
   const closePopup = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
+    setMetadata(null);
     setPopupType(null);
   };
 
@@ -22,9 +28,11 @@ export default function ElementButtons({
         {elementType === 'file' && (
           <button
             className="info-element-button"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               setPopupType('info');
+              const data = await loadMetadata(elementId);
+              setMetadata(data);
             }}
           >
             <FaInfoCircle />
@@ -62,7 +70,31 @@ export default function ElementButtons({
         <>
           <div className="overlay" onClick={closePopup} />
           <div className="popup-centered">
-            {popupType === 'info' && <h3>Информация за файла</h3>}
+            {popupType === 'info' && (
+              <>
+                {metaData ? (
+                  <div className="meta-info-details">
+                    <p>
+                      <strong>Име:</strong> {metaData.filename || 'Няма данни'}
+                    </p>
+                    <p>
+                      <strong>Размер:</strong>{' '}
+                      {metaData.chunkSize
+                        ? `${(metaData.chunkSize / 1024 / 1024).toFixed(2)} MB`
+                        : 'Няма данни'}
+                    </p>
+                    <p>
+                      <strong>Създаден на:</strong>{' '}
+                      {metaData.uploadDate
+                        ? new Date(metaData.uploadDate).toLocaleString()
+                        : 'Няма данни'}
+                    </p>
+                  </div>
+                ) : (
+                  <p>Зареждане...</p>
+                )}
+              </>
+            )}
             {popupType === 'share' &&
               section === 'my-drive' &&
               elementType === 'directory' && (
