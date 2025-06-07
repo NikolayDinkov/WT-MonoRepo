@@ -16,7 +16,10 @@ const FileItem: React.FC<FileItemProps> = ({ file, isMyFile: isMyFile }) => {
         <FaFileAlt className="item-icon file" />
         <span className="item-name">{file.name}</span>
       </div>
-      <ElementButtons onlyInfo={!isMyFile}></ElementButtons>
+      <ElementButtons
+        elementType="file"
+        section={isMyFile ? 'my-drive' : 'shared-with-me'}
+      ></ElementButtons>
     </div>
   );
 };

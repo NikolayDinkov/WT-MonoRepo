@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
 import './ElementButtons.css';
+import { ElementButtonsProps } from '../../interfaces/Element';
 
-export default function ElementButtons({ onlyInfo = false }) {
+export default function ElementButtons({
+  elementType,
+  section,
+}: ElementButtonsProps) {
   const [popupType, setPopupType] = useState<
     null | 'info' | 'share' | 'delete'
   >(null);
@@ -15,27 +19,32 @@ export default function ElementButtons({ onlyInfo = false }) {
   return (
     <>
       <div className="element-buttons">
-        <button
-          className="info-element-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setPopupType('info');
-          }}
-        >
-          <FaInfoCircle />
-        </button>
+        {elementType === 'file' && (
+          <button
+            className="info-element-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPopupType('info');
+            }}
+          >
+            <FaInfoCircle />
+          </button>
+        )}
 
-        {!onlyInfo && (
+        {section === 'my-drive' && (
           <>
-            <button
-              className="share-element-button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPopupType('share');
-              }}
-            >
-              <FaShareAlt />
-            </button>
+            {elementType === 'directory' && (
+              <button
+                className="share-element-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPopupType('share');
+                }}
+              >
+                <FaShareAlt />
+              </button>
+            )}
+
             <button
               className="delete-element-button"
               onClick={(e) => {
@@ -54,15 +63,17 @@ export default function ElementButtons({ onlyInfo = false }) {
           <div className="overlay" onClick={closePopup} />
           <div className="popup-centered">
             {popupType === 'info' && <h3>Информация за файла</h3>}
-            {popupType === 'share' && !onlyInfo && (
-              <>
-                <h3>Споделяне на файла</h3>
-                <input type="text" placeholder="Username" />
-                {/* share logic should be added here */}
-                <button className="approve-share-button">Сподели</button>
-              </>
-            )}
-            {popupType === 'delete' && !onlyInfo && (
+            {popupType === 'share' &&
+              section === 'my-drive' &&
+              elementType === 'directory' && (
+                <>
+                  <h3>Споделяне на файла</h3>
+                  <input type="text" placeholder="Username" />
+                  {/* share logic should be added here */}
+                  <button className="approve-share-button">Сподели</button>
+                </>
+              )}
+            {popupType === 'delete' && section === 'my-drive' && (
               <>
                 <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
                 <div className="popup-actions">
