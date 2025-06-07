@@ -48,7 +48,7 @@ const getMetadataById = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-export const createDirectory = async (
+const createDirectory = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
@@ -133,11 +133,42 @@ const uploadFiles = async (
   }
 };
 
+const shareElementWithUser = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = new Types.ObjectId(req.userId);
+    const { elementId, sharedWithUserId } = req.body;
+
+    if (!sharedWithUserId) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const sharedWith = new Types.ObjectId(sharedWithUserId);
+
+    const updatedElement = await ElementService.shareElementWithUser(
+      userId,
+      elementId,
+      sharedWith
+    );
+
+    res
+      .status(200)
+      .json(updatedElement);
+  } catch (exError: any) {
+    res
+      .status(400)
+      .json({ error: exError.message || 'Failed to share element' });
+  }
+}
+
 const downloadFile = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { stream, file } = await FileService.downloadFileById(
-      req.params.elementId
-    );
+    const { stream, file } = await FileService
+      .downloadFileById(req.params.fileId);
+
     res.set('Content-Type', file.contentType);
     res.set('Content-Disposition', `attachment; filename=${file.filename}`);
     stream.pipe(res);
@@ -160,15 +191,25 @@ const downloadFiles = async (_req: AuthenticatedRequest, res: Response) => {
 
 const renameFile = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { fileId, newName } = req.body;
-    const result = await FileService.renameFileById(fileId, newName);
+    const userId = new Types.ObjectId(req.userId);
+    const { elementId, newName } = req.body;
+    if (!elementId || !newName) {
+      return res.status(400).json({ error: 'File ID and new name are required' });
+    }
+
+    const result = await ElementService.renameElementById(
+      new Types.ObjectId(elementId),
+      newName,
+      userId
+    );
+    
     res.status(200).json(result);
   } catch (exError: any) {
     res.status(400).json({ error: exError.message || 'Rename failed' });
   }
 };
 
-export const deleteElement = async (
+const deleteElement = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
@@ -191,6 +232,7 @@ export default {
   getAllSharedWithUser,
   getMetadataById,
   createDirectory,
+  shareElementWithUser,
   uploadFile,
   uploadFiles,
   downloadFile,

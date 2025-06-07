@@ -1,12 +1,16 @@
 import { getGridFSBucket } from '../config/database';
 import mongoose, { Types } from 'mongoose';
 
+<<<<<<< HEAD
 // import element.service.ts so i can use the methods inside
 import { deleteElementByGridFsId } from './element.service';
 
 export const getFileMetadataById = async (
   fileId: Types.ObjectId
 ): Promise<any> => {
+=======
+export const getFileMetadataById = async (fileId: Types.ObjectId): Promise<any> => {
+>>>>>>> e0c7477859808e51b4bcdd477347af752b6d97fe
   const bucket = getGridFSBucket();
   const files = await bucket.find({ _id: fileId }).toArray();
   if (files.length === 0) throw new Error('File not found');
@@ -58,11 +62,15 @@ export const downloadMultipleFiles = async (): Promise<{ archive: any }> => {
   return { archive };
 };
 
-export const renameFileById = async (fileId: string, newName: string) => {
+export const renameFileById = async (fileId: ypes.ObjectId, newName: string) => {
   const bucket = getGridFSBucket();
+<<<<<<< HEAD
   const files = await bucket
     .find({ _id: new Types.ObjectId(fileId) })
     .toArray();
+=======
+  const files = await bucket.find({ _id: fileId }).toArray();
+>>>>>>> e0c7477859808e51b4bcdd477347af752b6d97fe
   if (files.length === 0) throw new Error('File not found');
 
   await bucket.rename(new Types.ObjectId(fileId), newName);
