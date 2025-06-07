@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
 import './ElementButtons.css';
 import { ElementButtonsProps } from '../../interfaces/Element';
-
-import { loadMetadata } from '../../services/FileService';
+import { deleteElement, loadMetadata } from '../../services/FileService';
+import { useFileContext } from '../../contexts/fileContext';
 
 export default function ElementButtons({
   elementId,
@@ -20,6 +20,21 @@ export default function ElementButtons({
     e.stopPropagation();
     setMetadata(null);
     setPopupType(null);
+  };
+
+  const { reloadFiles } = useFileContext();
+
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    try {
+      await deleteElement(elementId);
+      alert('Файлът беше изтрит успешно.');
+      setPopupType(null);
+    } catch (error) {
+      alert('Грешка при изтриване на файла.');
+      console.log(error);
+    }
+    reloadFiles();
   };
 
   return (
@@ -79,8 +94,8 @@ export default function ElementButtons({
                     </p>
                     <p>
                       <strong>Размер:</strong>{' '}
-                      {metaData.chunkSize
-                        ? `${(metaData.chunkSize / 1024 / 1024).toFixed(2)} MB`
+                      {metaData.length
+                        ? `${(metaData.length / 1024).toFixed(3)} KB`
                         : 'Няма данни'}
                     </p>
                     <p>
@@ -110,7 +125,7 @@ export default function ElementButtons({
                 <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
                 <div className="popup-actions">
                   {/* delete logic should be added here */}
-                  <button onClick={closePopup}>Да</button>
+                  <button onClick={handleDelete}>Да</button>
                   <button onClick={closePopup}>Не</button>
                 </div>
               </>
