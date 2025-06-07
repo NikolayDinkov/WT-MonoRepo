@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import './Header.css';
 import { FiSearch, FiX, FiFolder, FiFileText, FiUser } from 'react-icons/fi';
 import { useFileContext } from '../../contexts/fileContext';
@@ -90,7 +91,14 @@ const Header: React.FC = () => {
 
             {filteredElements.length > 0 ? (
               filteredElements.map((element, idx) => (
-                <div key={idx} className="search-result-item">
+                <NavLink
+                  to={
+                    element.parent ? `/my-drive/${element.parent}` : '/my-drive'
+                  }
+                  key={idx}
+                  className="search-result-item"
+                  onClick={() => setShowResults(false)}
+                >
                   <div
                     style={{
                       display: 'flex',
@@ -108,7 +116,7 @@ const Header: React.FC = () => {
                       <div className="element-path">{element.path}</div>
                     </div>
                   </div>
-                </div>
+                </NavLink>
               ))
             ) : (
               <div className="no-results">Няма резултати</div>
