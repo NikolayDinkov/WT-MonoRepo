@@ -56,10 +56,7 @@ export const FileService = {
     });
     // Append parent and path if provided
     if (payload.parentId !== undefined) {
-      formData.append('parent', payload.parentId || '');
-    }
-    if (payload.path !== undefined) {
-      formData.append('path', payload.path || '');
+      formData.append('parentId', payload.parentId || '');
     }
 
     const response = await axios.post(

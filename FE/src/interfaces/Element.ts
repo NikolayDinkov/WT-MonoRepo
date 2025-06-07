@@ -26,5 +26,4 @@ export interface CreateDirectoryPayload {
 export interface UploadFilesPayload {
   files: FileList;
   parentId?: string | null; // Optional, if not provided, it will be uploaded to the root
-  path?: string;
 }

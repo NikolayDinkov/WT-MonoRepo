@@ -122,7 +122,6 @@ const CreateButton = () => {
                   await FileService.uploadFiles({
                     files,
                     parentId: directoryId || null,
-                    path: '/', // You may want to use a more specific path if available
                   });
                   reloadFiles();
                 } catch (err) {
@@ -158,7 +157,6 @@ const CreateButton = () => {
                   await FileService.uploadFiles({
                     files,
                     parentId: directoryId || null,
-                    path: '/', // You may want to use a more specific path if available
                   });
                   reloadFiles();
                 } catch (err) {

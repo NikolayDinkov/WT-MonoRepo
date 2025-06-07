@@ -114,7 +114,6 @@ export const createDirectory = async (
       path = `${parentElement.path}/${name}`;
     }
   }
-  console.log(`Creating directory at path: ${path}`);
 
   const newDirectory = await Element.create({
     name,
@@ -155,7 +154,7 @@ export const uploadFileForOwner = async (
 
   const element = new Element({
     name: file.originalname,
-    path: path,
+    path: `${path}/${file.originalname}`,
     parent: parentId,
     owner: userId,
     sharedWith: [],
@@ -171,12 +170,25 @@ export const uploadFileForOwner = async (
 export const uploadFilesForOwner = async (
   userId: Types.ObjectId,
   files: Express.Multer.File[],
-  parentId: Types.ObjectId | null,
-  path: string
+  parentId: Types.ObjectId | null
 ) => {
+  let parentPath = '';
+  console.log(parentId);
+  if (parentId) {
+    const parentElement = await Element.findById(parentId).lean().exec();
+    if (!parentElement || parentElement.type !== 'directory') {
+      throw new Error('Invalid parent directory');
+    }
+    if (parentElement) {
+      parentPath = `${parentElement.path}`;
+    }
+  }
   const elements = files.map((file) => {
     const fileWithId = file as Express.Multer.File & { id: Types.ObjectId };
-
+    let path = `/${file.originalname}`;
+    if (parentId) {
+      path = `${parentPath}/${file.originalname}`;
+    }
     return new Element({
       name: file.originalname,
       path: path,
