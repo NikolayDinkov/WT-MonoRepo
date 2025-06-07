@@ -5,7 +5,6 @@ import { checkAuth } from '../middleware/auth';
 const router = Router();
 
 router.use('/users', users);
-router.use(checkAuth); //every route after this one is protected
-router.use('/elements', elements);
+router.use('/elements', checkAuth, elements);
 
 export default router;

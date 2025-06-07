@@ -5,7 +5,9 @@ import elementController from '../controllers/element.controller';
 
 const router = Router();
 
-router.get('/:ownerId', elementController.getElements);
+router.get('/', elementController.getAllElements);
+router.get('/shared', elementController.getAllSharedWithUser);
+
 router.post(
   '/upload/file/:ownerId',
   upload().single('file'),
@@ -16,6 +18,7 @@ router.post(
   upload().array('files'),
   elementController.uploadFiles
 );
+
 router.post('/download/files/:fileId', elementController.downloadFile);
 router.post('/download/files', elementController.downloadFiles);
 router.post('/delete/files/:fileId', elementController.deleteFile);

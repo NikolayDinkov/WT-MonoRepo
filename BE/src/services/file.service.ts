@@ -1,13 +1,23 @@
 import { getGridFSBucket } from '../config/database';
-import { Response } from 'express';
 import mongoose, { Types } from 'mongoose';
+// import element.service.ts so i can use the methods inside
+import { deleteElementByGridFsId } from './element.service';
 
-export const uploadFileForOwner = (ownerId: Types.ObjectId, file: Express.Multer.File) => {
+export const uploadFileForOwner = (userId: Types.ObjectId, file: Express.Multer.File) => {
   const { originalname, mimetype, size, buffer } = file;
+
+
   // Your upload logic here
 };
 
-export const uploadFilesForOwner = (ownerId: Types.ObjectId, files: Express.Multer.File[]) => {
+export const getFileMetadataById = async (fileId: string): Promise<any> => {
+  const bucket = getGridFSBucket();
+  const files = await bucket.find({ _id: new mongoose.Types.ObjectId(fileId) }).toArray();
+  if (files.length === 0) throw new Error('File not found');
+  return files[0];
+}
+
+export const uploadFilesForOwner = (userId: Types.ObjectId, files: Express.Multer.File[]) => {
   files.forEach(file => {
     const { originalname, mimetype, size, buffer } = file;
     // Your upload logic here
@@ -60,6 +70,7 @@ export const deleteFileById = async (fileId: string) => {
   if (files.length === 0) throw new Error('File not found');
 
   await bucket.delete(new Types.ObjectId(fileId));
+  deleteElementByGridFsId(new Types.ObjectId(fileId));
 
   return { message: 'File deleted successfully' };
 };
