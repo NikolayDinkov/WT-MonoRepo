@@ -1,15 +1,10 @@
 import React from 'react';
-import './MainContent.css';
 import { Directory, File } from '../../interfaces/Element';
 import FileList from '../FileList/FileList';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFileContext } from '../../contexts/fileContext';
 
-interface MainContentProps {
-  page: string;
-}
-
-const MainContent: React.FC<MainContentProps> = ({ page }) => {
+const MyDrive: React.FC = () => {
   const { directoryId } = useParams<{ directoryId: string }>();
   const { myDrive } = useFileContext();
   const currentPath: string | null = directoryId || null;
@@ -29,18 +24,14 @@ const MainContent: React.FC<MainContentProps> = ({ page }) => {
 
   return (
     <div className="main-content">
-      {page === 'myDrive' && (
-        <>
-          <FileList
-            directories={directories}
-            files={files}
-            onDirectoryClick={handleDirectoryClick}
-          />
-        </>
-      )}
-      {page === 'shared' && <h1>Споделено с мен</h1>}
+      <FileList
+        directories={directories}
+        files={files}
+        onDirectoryClick={handleDirectoryClick}
+        isMyFile={true}
+      />
     </div>
   );
 };
 
-export default MainContent;
+export default MyDrive;

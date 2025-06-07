@@ -2,22 +2,26 @@ import React from 'react';
 import { FaFolder } from 'react-icons/fa';
 import { Directory } from '../../interfaces/Element';
 import './DirectoryItem.css';
+import ElementButtons from '../ElementButtons/ElementButtons';
 
 export interface DirectoryItemProps {
   directory: Directory;
   onClick: (directory: Directory) => void;
+  isMyFile: boolean;
 }
 
 const DirectoryItem: React.FC<DirectoryItemProps> = ({
   directory,
   onClick,
+  isMyFile: isMyFile,
 }) => {
   return (
-    <div className="item-container" onClick={() => onClick(directory)}>
-      <div className="item-icon folder">
+    <div className="item-container">
+      <div className="click-container" onClick={() => onClick(directory)}>
         <FaFolder />
+        <span className="item-name">{directory.name}</span>
       </div>
-      <span className="item-name">{directory.name}</span>
+      <ElementButtons onlyInfo={!isMyFile}></ElementButtons>
     </div>
   );
 };
