@@ -2,18 +2,42 @@ import Element, { IElement } from '../models/element.model';
 import { Types } from 'mongoose';
 import { getGridFSBucket } from '../config/database';
 
-import { getFileMetadataById, getFilesByIds } from './file.service';
+import { getFileMetadataById, getFilesByIds, renameFileById } from './file.service';
 import { CreateDirectoryInput } from '../interfaces/createDirectoryInput';
 
 export const getAllElementsForOwner = (userId: Types.ObjectId) => {
   return Element.find({ owner: userId }).lean().exec();
 };
 
-export const getAllSharedElementsForUser = (userId: Types.ObjectId) => {
-  return Element.find({ sharedWith: { $in: [userId] } })
+export async function getAllSharedElementsForUser(userId: Types.ObjectId) {
+  const rootDirs = await Element.find({ sharedWith: { $in: [userId] } })
     .lean()
     .exec();
-};
+
+    // Make an array and get every element below the root directories
+  const allSharedElements: IElement[] = [];
+  for (const root of rootDirs) {
+    await collectSharedElementsRecursively(root.id, allSharedElements, userId);
+  }
+  return allSharedElements;
+}
+
+async function collectSharedElementsRecursively(
+  parentId: Types.ObjectId,
+  result: IElement[],
+  userId: Types.ObjectId
+) {
+  const children = await Element.find({ parent: parentId }).lean().exec();
+
+  for (const child of children) {
+    if (child.sharedWith.includes(userId)) {
+      result.push(child);
+    }
+    if (child.type === 'directory') {
+      await collectSharedElementsRecursively(child.id, result, userId);
+    }
+  }
+}
 
 export const getMetadataById = async (
   userId: Types.ObjectId,
@@ -98,6 +122,43 @@ async function checkIfFileIsSharedWithUser(
   }
 
   return false; // no access found
+}
+
+export const shareElementWithUser = async (
+  userId: Types.ObjectId,
+  elementId: Types.ObjectId,
+  ownerId: Types.ObjectId
+): Promise<IElement> => {
+  const element = await Element
+    .findById(elementId)
+    .exec();
+
+  if (!element) {
+    throw new Error('Element not found');
+  }
+  if (!element.owner.equals(ownerId)) {
+    throw new Error('Not authorized to share this element');
+  }
+  if (element.sharedWith.some((id) => id.equals(userId))) {
+    throw new Error('Element already shared with this user');
+  }
+
+  // Check if the user already has access through a parent directory
+  let currentElement = element as IElement;
+  while (currentElement.parent) {
+    const parent = await Element.findById(currentElement.parent).lean().exec();
+    if (!parent) {
+      break;
+    }
+    if (parent.sharedWith.some((id) => id.equals(userId))) {
+      return element;
+    }
+    currentElement = parent;
+  }
+
+  element.sharedWith.push(userId);
+  await element.save();
+  return element;
 }
 
 export const createDirectory = async (
@@ -239,6 +300,56 @@ export const uploadFilesForOwner = async (
 
   return elements;
 };
+
+export const renameElementById = async (
+  elementId: Types.ObjectId,
+  newName: string,
+  ownerId: Types.ObjectId
+): Promise<IElement> => {
+  const element = await Element
+    .findById(elementId)
+    .exec();
+
+  if (!element) {
+    throw new Error('Element not found');
+  }
+  if (!element.owner.equals(ownerId)) {
+    throw new Error('Not authorized to rename this element');
+  }
+  if (element.name === newName) {
+    return element;
+  }
+  // Check if a file with the same name already exists in the same directory
+  const existingElement = await Element.findOne({
+    name:
+    newName,
+    parent: element.parent,
+    type: element.type,
+  }).exec();
+  if (existingElement) {
+    throw new Error('An element with the same name already exists in this directory');
+  }
+  
+  // Update the element's name and path
+  element.name = newName;
+  if (element.parent) {
+    const parentElement = await Element.findById(element.parent).lean().exec();
+    if (parentElement) {
+      element.path = `${parentElement.path}/${newName}`;
+    } else {
+      element.path = `/${newName}`;
+    }
+  } else {
+    element.path = `/${newName}`;
+  }
+  await element.save();
+
+  if (element.type === 'file' && element.gridFsId) {
+    renameFileById(element.gridFsId, newName);
+  }
+
+  return element;
+}
 
 export const createElement = (elementData: {
   name: string;
