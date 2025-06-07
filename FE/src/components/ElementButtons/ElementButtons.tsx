@@ -8,6 +8,8 @@ import axios from 'axios';
 export default function ElementButtons({
   onlyInfo = false,
   elementId,
+  elementType,
+  section,
 }: ElementButtonsProps) {
   const [popupType, setPopupType] = useState<
     null | 'info' | 'share' | 'delete'
@@ -48,28 +50,33 @@ export default function ElementButtons({
   return (
     <>
       <div className="element-buttons">
-        <button
-          className="info-element-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setPopupType('info');
-            loadMetadata();
-          }}
-        >
-          <FaInfoCircle />
-        </button>
+        {elementType === 'file' && (
+          <button
+            className="info-element-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPopupType('info');
+              loadMetadata();
+            }}
+          >
+            <FaInfoCircle />
+          </button>
+        )}
 
-        {!onlyInfo && (
+        {section === 'my-drive' && (
           <>
-            <button
-              className="share-element-button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPopupType('share');
-              }}
-            >
-              <FaShareAlt />
-            </button>
+            {elementType === 'directory' && (
+              <button
+                className="share-element-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPopupType('share');
+                }}
+              >
+                <FaShareAlt />
+              </button>
+            )}
+
             <button
               className="delete-element-button"
               onClick={(e) => {
@@ -87,26 +94,18 @@ export default function ElementButtons({
         <>
           <div className="overlay" onClick={closePopup} />
           <div className="popup-centered">
-            {popupType === 'info' && (
-              <>
-                {metaData ? (
-                  <pre className="meta-info-box">
-                    {JSON.stringify(metaData, null, 2)}
-                  </pre>
-                ) : (
-                  <p>Зареждане...</p>
-                )}
-              </>
-            )}
-            {popupType === 'share' && !onlyInfo && (
-              <>
-                <h3>Споделяне на файла</h3>
-                <input type="text" placeholder="Username" />
-                {/* share logic should be added here */}
-                <button className="approve-share-button">Сподели</button>
-              </>
-            )}
-            {popupType === 'delete' && !onlyInfo && (
+            {popupType === 'info' && <h3>Информация за файла</h3>}
+            {popupType === 'share' &&
+              section === 'my-drive' &&
+              elementType === 'directory' && (
+                <>
+                  <h3>Споделяне на файла</h3>
+                  <input type="text" placeholder="Username" />
+                  {/* share logic should be added here */}
+                  <button className="approve-share-button">Сподели</button>
+                </>
+              )}
+            {popupType === 'delete' && section === 'my-drive' && (
               <>
                 <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
                 <div className="popup-actions">

@@ -20,6 +20,8 @@ const FileItem: React.FC<FileItemProps> = ({ file, isMyFile: isMyFile }) => {
       <ElementButtons
         onlyInfo={!isMyFile}
         elementId={file._id}
+        elementType="file"
+        section={isMyFile ? 'my-drive' : 'shared-with-me'}
       ></ElementButtons>
     </div>
   );

@@ -31,4 +31,6 @@ export interface UploadFilesPayload {
 export interface ElementButtonsProps {
   onlyInfo?: boolean;
   elementId: string;
+  elementType: 'file' | 'directory';
+  section: 'my-drive' | 'shared-with-me';
 }
