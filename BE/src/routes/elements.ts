@@ -7,17 +7,12 @@ const router = Router();
 
 router.get('/', elementController.getAllElements);
 router.get('/shared', elementController.getAllSharedWithUser);
+router.get('/metadata/:elementId', elementController.getMetadataById);
 
-router.post(
-  '/upload/file/:ownerId',
-  upload().single('file'),
-  elementController.uploadFile
-);
-router.post(
-  '/upload/files/:ownerId',
-  upload().array('files'),
-  elementController.uploadFiles
-);
+router.post('/create/directory', elementController.createDirectory);
+
+router.post('/upload/file', upload().single('file'), elementController.uploadFile);
+router.post('/upload/files', upload().array('files'), elementController.uploadFiles);
 
 router.post('/download/files/:fileId', elementController.downloadFile);
 router.post('/download/files', elementController.downloadFiles);

@@ -23,7 +23,7 @@ const getAllSharedWithUser = async (req: AuthenticatedRequest, res: Response) =>
   }
 }
 
-const getMetadataByName = async (req: AuthenticatedRequest, res: Response) => {
+const getMetadataById = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const metadata = await ElementService.getMetadataById(new Types.ObjectId(req.userId), new Types.ObjectId(req.params.elementId));
     res.status(200).json(metadata);
@@ -32,33 +32,67 @@ const getMetadataByName = async (req: AuthenticatedRequest, res: Response) => {
   }
 }
 
-const uploadFile = async (req: AuthenticatedRequest, res: Response) => {
+export const createDirectory = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = new Types.ObjectId(req.userId);
-    if (req.file) {
-      await FileService.uploadFileForOwner(userId, req.file);
-      res.status(200).json({ message: 'File uploaded successfully' });
-    } else {
-      res.status(400).json({ error: 'No file provided' });
-    }
-  } catch (exError: any) {
-    res.status(400).json({ error: exError.message || 'File upload failed' });
+    const owner = new Types.ObjectId(req.userId);
+    const { name, parent } = req.body;
+
+    const parentId = parent ? new Types.ObjectId(parent) : null;
+
+    const newDir = await ElementService.createDirectory({
+      name,
+      parent: parentId,
+      owner,
+    });
+
+    res.status(201).json(newDir);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Failed to create directory' });
   }
 };
 
-const uploadFiles = async (req: AuthenticatedRequest, res: Response) => {
+const uploadFile = async (req: AuthenticatedRequest, res: Response) : Promise<void>  => {
   try {
-    const userId = new Types.ObjectId(req.userId);
-    if (req.files && Array.isArray(req.files)) {
-      await FileService.uploadFilesForOwner(userId, req.files as Express.Multer.File[]);
-      res.status(200).json({ message: 'Files uploaded successfully' });
-    } else {
-      res.status(400).json({ error: 'No files provided' });
+    if (!req.file) {
+      res.status(400).json({ error: 'No file uploaded' });
+      return;
     }
+
+    const userId = new Types.ObjectId(req.userId);
+    const parentId = req.body.parentId ? new(req.body.parentId) : null;
+    const path = req.body.path || '/';
+
+    const element = await ElementService.uploadFileForOwner(userId, req.file, parentId, path);
+
+    res.status(201).json({ message: 'File uploaded successfully', element });
   } catch (exError: any) {
-    res.status(400).json({ error: exError.message || 'Files upload failed' });
+    console.error('[UploadFile Controller] Error:', exError);
+    res.status(500).json({ error: exError.message || 'Internal server error' });
   }
 };
+
+const uploadFiles = async (req: AuthenticatedRequest, res: Response) : Promise<void> => {
+  try {
+    const userId = new Types.ObjectId(req.userId);
+    const parentId = req.body.parentId ? new(req.body.parentId) : null;
+    const path = req.body.path || '/';
+
+    const files = req.files as Express.Multer.File[];
+
+    if (!files || files.length === 0) {
+      res.status(400).json({ error: 'No files uploaded' });
+      return;
+    }
+
+    const elements = await ElementService.uploadFilesForOwner(userId, files, parentId, path);
+
+    res.status(201).json({ message: 'Files uploaded successfully', elements });
+  } catch (err: any) {
+    console.error('[UploadFiles Controller] Error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+};
+
 
 const downloadFile = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -106,6 +140,8 @@ const deleteFile = async (req: AuthenticatedRequest, res: Response) => {
 export default {
   getAllElements,
   getAllSharedWithUser,
+  getMetadataById,
+  createDirectory,
   uploadFile,
   uploadFiles,
   downloadFile,
