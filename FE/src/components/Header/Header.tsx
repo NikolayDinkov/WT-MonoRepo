@@ -10,17 +10,23 @@ const Header: React.FC = () => {
   const [filterType, setFilterType] = useState<'all' | 'directory' | 'file'>(
     'all'
   );
+  const [searchIn, setSearchIn] = useState<'my-drive' | 'shared-with-me'>(
+    'my-drive'
+  );
+
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const { myDrive } = useFileContext();
+  const { myDrive, sharedFiles } = useFileContext();
 
   function handleLogout() {
     localStorage.removeItem('token');
     window.location.reload();
   }
 
-  const filteredElements = myDrive.filter((el) => {
+  const collectionForFilter = searchIn === 'my-drive' ? myDrive : sharedFiles;
+
+  const filteredElements = collectionForFilter.filter((el) => {
     const matchesText = el.name
       .toLowerCase()
       .includes(searchTerm.trim().toLowerCase());
@@ -74,26 +80,50 @@ const Header: React.FC = () => {
         )}
         {searchTerm && showResults && (
           <div className="search-results">
-            <div className="search-filter">
-              <label htmlFor="type-select">Търсене по:</label>
-              <select
-                id="type-select"
-                value={filterType}
-                onChange={(e) =>
-                  setFilterType(e.target.value as 'all' | 'directory' | 'file')
-                }
-              >
-                <option value="all">Всичко</option>
-                <option value="directory">Директории</option>
-                <option value="file">Файлове</option>
-              </select>
+            <div className="vertical-options">
+              <div className="search-filter">
+                <label htmlFor="type-select">Търсене по:</label>
+                <select
+                  id="type-select"
+                  value={filterType}
+                  onChange={(e) =>
+                    setFilterType(
+                      e.target.value as 'all' | 'directory' | 'file'
+                    )
+                  }
+                >
+                  <option value="all">Всичко</option>
+                  <option value="directory">Директории</option>
+                  <option value="file">Файлове</option>
+                </select>
+              </div>
+
+              <div className="search-filter">
+                <label htmlFor="type-select">Търсене в:</label>
+                <select
+                  id="type-select"
+                  value={searchIn}
+                  onChange={(e) =>
+                    setSearchIn(e.target.value as 'my-drive' | 'shared-with-me')
+                  }
+                >
+                  <option value="my-drive">Моят drive</option>
+                  <option value="shared-with-me">Споделено с мен</option>
+                </select>
+              </div>
             </div>
 
             {filteredElements.length > 0 ? (
               filteredElements.map((element, idx) => (
                 <NavLink
                   to={
-                    element.parent ? `/my-drive/${element.parent}` : '/my-drive'
+                    searchIn === 'my-drive'
+                      ? element.parent
+                        ? `/my-drive/${element.parent}`
+                        : '/my-drive'
+                      : element.parent
+                        ? `/shared-with-me/${element.parent}`
+                        : '/shared-with-me'
                   }
                   key={idx}
                   className="search-result-item"
