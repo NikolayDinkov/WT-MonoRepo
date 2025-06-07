@@ -7,7 +7,10 @@ export default function ElementButtons({ onlyInfo = false }) {
     null | 'info' | 'share' | 'delete'
   >(null);
 
-  const closePopup = () => setPopupType(null);
+  const closePopup = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setPopupType(null);
+  };
 
   return (
     <>
@@ -48,7 +51,7 @@ export default function ElementButtons({ onlyInfo = false }) {
 
       {popupType && (
         <>
-          <div className="overlay" />
+          <div className="overlay" onClick={closePopup} />
           <div className="popup-centered">
             {popupType === 'info' && <h3>Информация за файла</h3>}
             {popupType === 'share' && !onlyInfo && (
@@ -64,7 +67,7 @@ export default function ElementButtons({ onlyInfo = false }) {
                 <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
                 <div className="popup-actions">
                   {/* delete logic should be added here */}
-                  <button onClick={() => closePopup()}>Да</button>
+                  <button onClick={closePopup}>Да</button>
                   <button onClick={closePopup}>Не</button>
                 </div>
               </>

@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import './CreateButton.css';
 import { FaPlus, FaFileUpload, FaFolderOpen } from 'react-icons/fa';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { FileService } from '../../services/FileService';
+import { useFileContext } from '../../contexts/fileContext';
 
 const CreateButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,10 +12,16 @@ const CreateButton = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
+  const { directoryId } = useParams<{ directoryId?: string }>();
+  const { reloadFiles } = useFileContext();
+  const navigate = useNavigate();
+  const path = useLocation().pathname;
+  const isMyDrive = path.includes('/my-drive');
 
   const toggleMenu = () => {
     setIsOpen((prev) => !prev);
   };
+  console.log('directoryId', directoryId);
 
   const openFolderPopup = () => {
     setShowFolderPopup(true);
@@ -24,9 +33,30 @@ const CreateButton = () => {
     setFolderName('');
   };
 
-  const handleSaveFolder = () => {
-    // TODO: handle folder creation logic here
-    closeFolderPopup();
+  const handleSaveFolder = async () => {
+    if (!folderName.trim()) {
+      alert('Please enter a folder name');
+      return;
+    }
+    try {
+      if (isMyDrive) {
+        await FileService.createDirectory({
+          name: folderName,
+          parent: directoryId || null,
+        });
+      } else {
+        await FileService.createDirectory({
+          name: folderName,
+          parent: null,
+        });
+        navigate('/my-drive');
+      }
+    } catch (_) {
+      alert('Error creating folder');
+    } finally {
+      reloadFiles();
+      closeFolderPopup();
+    }
   };
 
   useEffect(() => {
@@ -85,8 +115,22 @@ const CreateButton = () => {
               type="file"
               style={{ display: 'none' }}
               multiple
-              onChange={() => {
-                /* handle file upload here */
+              onChange={async (e) => {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+                try {
+                  await FileService.uploadFiles({
+                    files,
+                    parentId: directoryId || null,
+                    path: '/', // You may want to use a more specific path if available
+                  });
+                  reloadFiles();
+                } catch (err) {
+                  alert('Error uploading files');
+                } finally {
+                  setIsOpen(false);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }
               }}
             />
           </button>
@@ -103,8 +147,26 @@ const CreateButton = () => {
               type="file"
               style={{ display: 'none' }}
               multiple
-              onChange={() => {
-                /* handle folder upload here */
+              // @ts-ignore
+              webkitdirectory=""
+              // @ts-ignore
+              directory=""
+              onChange={async (e) => {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+                try {
+                  await FileService.uploadFiles({
+                    files,
+                    parentId: directoryId || null,
+                    path: '/', // You may want to use a more specific path if available
+                  });
+                  reloadFiles();
+                } catch (err) {
+                  alert('Error uploading folder');
+                } finally {
+                  setIsOpen(false);
+                  if (folderInputRef.current) folderInputRef.current.value = '';
+                }
               }}
             />
           </button>

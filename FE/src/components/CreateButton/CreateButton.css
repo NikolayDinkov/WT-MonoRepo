@@ -37,14 +37,16 @@
 }
 
 .dropdown-menu {
-  margin-top: 8px;
   display: flex;
   flex-direction: column;
+  position: absolute;
+  transform: translateY(-55%);
+  left: -5px;
+  background-color: white;
   gap: 10px;
-
-  border: none;
-  box-shadow: none;
-  background: transparent;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 6px;
 }
 
 .dropdown-item {

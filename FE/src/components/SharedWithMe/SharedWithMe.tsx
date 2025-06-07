@@ -6,15 +6,15 @@ import { useFileContext } from '../../contexts/fileContext';
 
 const SharedWithMe: React.FC = () => {
   const { directoryId } = useParams<{ directoryId: string }>();
-  const { myDrive } = useFileContext(); //this should be changed once we have fetchSharedElements from the backend
+  const { sharedFiles } = useFileContext(); //this should be changed once we have fetchSharedElements from the backend
   const currentPath: string | null = directoryId || null;
   const navigate = useNavigate();
 
-  const directories: Directory[] = myDrive.filter(
+  const directories: Directory[] = sharedFiles.filter(
     (el): el is Directory =>
       el.type === 'directory' && el.parent === currentPath
   );
-  const files: File[] = myDrive.filter(
+  const files: File[] = sharedFiles.filter(
     (el): el is File => el.type === 'file' && el.parent === currentPath
   );
 

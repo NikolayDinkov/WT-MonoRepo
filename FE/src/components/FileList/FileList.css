@@ -1,22 +1,5 @@
 .file-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
   padding: 20px;
-}
-
-.directory-item, .file-item {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 12px;
-  background-color: #f9f9f9;
-  min-width: 120px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.item-icon {
-  font-size: 24px;
-  display: block;
-  margin-bottom: 8px;
+  overflow: auto;
+  height: 95vh;
 }

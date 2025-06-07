@@ -16,8 +16,8 @@ const DirectoryItem: React.FC<DirectoryItemProps> = ({
   isMyFile: isMyFile,
 }) => {
   return (
-    <div className="item-container">
-      <div className="click-container" onClick={() => onClick(directory)}>
+    <div className="item-container" onClick={() => onClick(directory)}>
+      <div className="click-container">
         <FaFolder />
         <span className="item-name">{directory.name}</span>
       </div>

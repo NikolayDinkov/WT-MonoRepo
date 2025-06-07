@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 import { useAuth } from '../../contexts/authContext';
 
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -15,10 +16,11 @@ export default function Login() {
     const password = formData.get('password') as string;
 
     const result = await login({ username, password });
-    if (!result.success) {
+    if (result.success) {
+      navigate('/my-drive');
+    } else {
       setErrorMessage(result.errorMessage || 'Login failed.');
     }
-    // On success, context will update and redirect handled by App
   }
 
   return (
