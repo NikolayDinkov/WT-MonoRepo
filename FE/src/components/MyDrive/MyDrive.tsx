@@ -7,7 +7,6 @@ import { useFileContext } from '../../contexts/fileContext';
 const MyDrive: React.FC = () => {
   const { directoryId } = useParams<{ directoryId: string }>();
   const { myDrive } = useFileContext();
-  const { myDrive } = useFileContext();
   const currentPath: string | null = directoryId || null;
   const navigate = useNavigate();
 
