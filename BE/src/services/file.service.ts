@@ -55,14 +55,3 @@ export const renameFileById = async (fileId: string, newName: string) => {
 
   return { message: 'File renamed successfully', filename: newName };
 };
-
-export const deleteFileById = async (fileId: string) => {
-  const bucket = getGridFSBucket();
-  const files = await bucket.find({ _id: new Types.ObjectId(fileId) }).toArray();
-  if (files.length === 0) throw new Error('File not found');
-
-  await bucket.delete(new Types.ObjectId(fileId));
-  deleteElementByGridFsId(new Types.ObjectId(fileId));
-
-  return { message: 'File deleted successfully' };
-};
