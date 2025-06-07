@@ -1,0 +1,55 @@
+.delete-element-button,
+.share-element-button,
+.info-element-button {
+  background-color: transparent;
+  border: none;
+  color: rgba(255, 0, 0, 0.89);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.delete-element-button:hover {
+  color: darkred;
+  transform: scale(1.1);
+}
+
+.share-element-button {
+  color: #4caf50;
+}
+
+.share-element-button:hover {
+  color: #388e3c;
+}
+
+.element-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.info-element-button {
+  color: #007bff;
+}
+
+.info-element-button:hover {
+  color: #0056b3;
+  transform: scale(1.1);
+}
+
+.approve-share-button {
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  background: #0b57d0;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 4px;
+}

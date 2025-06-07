@@ -7,11 +7,13 @@ export interface FileListProps {
   directories: Directory[];
   files: File[];
   onDirectoryClick: (directory: Directory) => void;
+  isMyFile: boolean;
 }
 
 const FileList: React.FC<FileListProps> = ({
   directories,
   files,
+  isMyFile: isMyFile,
   onDirectoryClick,
 }) => {
   console.log(directories, files);
@@ -22,10 +24,11 @@ const FileList: React.FC<FileListProps> = ({
           key={dir._id}
           directory={dir}
           onClick={onDirectoryClick}
+          isMyFile={isMyFile}
         />
       ))}
       {files.map((file) => (
-        <FileItem key={file._id} file={file} />
+        <FileItem key={file._id} file={file} isMyFile={isMyFile} />
       ))}
     </div>
   );

@@ -7,10 +7,11 @@ import {
 import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Header/Header';
-import MainContent from './components/MainContent/MainContent';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import { useAuth } from './contexts/authContext';
+import MyDrive from './components/MyDrive/MyDrive';
+import SharedWithMe from './components/SharedWithMe/SharedWithMe';
 
 const App = () => {
   const { isLoggedIn } = useAuth();
@@ -24,13 +25,10 @@ const App = () => {
             <div className="main-area">
               <Header />
               <Routes>
+                <Route path="/my-drive/:directoryId?" element={<MyDrive />} />
                 <Route
-                  path="/my-drive/:directoryId?"
-                  element={<MainContent page="myDrive" />}
-                />
-                <Route
-                  path="/shared-with-me"
-                  element={<MainContent page="shared" />}
+                  path="/shared-with-me/:directoryId?"
+                  element={<SharedWithMe />}
                 />
                 <Route path="*" element={<Navigate to="/my-drive" replace />} />
               </Routes>

@@ -1,0 +1,82 @@
+import { useState } from 'react';
+import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
+import './ElementButtons.css';
+
+export default function ElementButtons({ onlyInfo = false }) {
+  const [popupType, setPopupType] = useState<
+    null | 'info' | 'share' | 'delete'
+  >(null);
+
+  const closePopup = () => setPopupType(null);
+
+  return (
+    <>
+      <div className="element-buttons">
+        <button
+          className="info-element-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setPopupType('info');
+          }}
+        >
+          <FaInfoCircle />
+        </button>
+
+        {!onlyInfo && (
+          <>
+            <button
+              className="share-element-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPopupType('share');
+              }}
+            >
+              <FaShareAlt />
+            </button>
+            <button
+              className="delete-element-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPopupType('delete');
+              }}
+            >
+              <FaTrash />
+            </button>
+          </>
+        )}
+      </div>
+
+      {popupType && (
+        <>
+          <div className="overlay" />
+          <div className="popup-centered">
+            {popupType === 'info' && <h3>Информация за файла</h3>}
+            {popupType === 'share' && !onlyInfo && (
+              <>
+                <h3>Споделяне на файла</h3>
+                <input type="text" placeholder="Username" />
+                {/* share logic should be added here */}
+                <button className="approve-share-button">Сподели</button>
+              </>
+            )}
+            {popupType === 'delete' && !onlyInfo && (
+              <>
+                <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
+                <div className="popup-actions">
+                  {/* delete logic should be added here */}
+                  <button onClick={() => closePopup()}>Да</button>
+                  <button onClick={closePopup}>Не</button>
+                </div>
+              </>
+            )}
+            {popupType !== 'delete' && (
+              <div className="popup-actions">
+                <button onClick={closePopup}>Затвори</button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
