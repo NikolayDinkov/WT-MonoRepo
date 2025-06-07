@@ -1,5 +1,6 @@
 import Element, { IElement } from '../models/element.model';
 import { Types } from 'mongoose';
+import { getGridFSBucket } from '../config/database';
 
 import { getFileMetadataById, getFilesByIds } from './file.service';
 import { CreateDirectoryInput } from '../interfaces/createDirectoryInput';
@@ -142,6 +143,37 @@ export const getDirectoriesByName = (name: string) => {
 
 export const deleteElementByGridFsId = (gridFsId: Types.ObjectId) => {
   return Element.deleteOne({ gridFsId }).exec();
+};
+
+export const deleteElementById = async (elementId: Types.ObjectId, ownerId: Types.ObjectId): Promise<void> => {
+  const element = await Element.findById(elementId).exec();
+  if (!element) {
+    throw new Error('Element not found');
+  }
+
+  if (!element.owner.equals(ownerId)) {
+    throw new Error('Not authorized to delete this element');
+  }
+
+  if (element.type === 'file') {
+    if (element.gridFsId) {
+      const bucket = getGridFSBucket();
+      const files = await bucket.find({ _id: element.gridFsId }).toArray();
+      if (files.length > 0) {
+        await bucket.delete(element.gridFsId);
+      }
+    }
+
+    await Element.deleteOne({ _id: elementId });
+  } else if (element.type === 'directory') {
+    const children = await Element.find({ parent: element._id }).exec();
+
+    for (const child of children) {
+      await deleteElementById(child.id, ownerId); // recursive deletion
+    }
+
+    await Element.deleteOne({ _id: elementId });
+  }
 };
 
 export const uploadFileForOwner = async (

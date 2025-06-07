@@ -56,7 +56,7 @@ export const createDirectory = async (
     const owner = new Types.ObjectId(req.userId);
     const { name, parent } = req.body;
 
-    const parentId = parent ? new Types.ObjectId(parent) : null;
+    const parentId = parent ? new(parent) : null;
 
     const newDir = await ElementService.createDirectory({
       name,
@@ -83,7 +83,7 @@ const uploadFile = async (
     }
 
     const userId = new Types.ObjectId(req.userId);
-    const parentId = req.body.parentId ? new req.body.parentId() : null;
+    const parentId = req.body.parentId ? new Types.ObjectId(req.body.parentId) : null;
     const path = req.body.path || '/';
 
     const element = await ElementService.uploadFileForOwner(
@@ -165,13 +165,16 @@ const renameFile = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-const deleteFile = async (req: AuthenticatedRequest, res: Response) => {
+export const deleteElement = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { fileId } = req.params;
-    const result = await FileService.deleteFileById(fileId);
-    res.status(200).json(result);
-  } catch (exError: any) {
-    res.status(404).json({ error: exError.message || 'Delete failed' });
+    const userId = new Types.ObjectId(req.userId);
+    const elementId = new Types.ObjectId(req.params.elementId);
+
+    await ElementService.deleteElementById(elementId, userId);
+
+    res.status(200).json({ message: 'Element deleted successfully' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Failed to delete element' });
   }
 };
 
@@ -185,5 +188,5 @@ export default {
   downloadFile,
   downloadFiles,
   renameFile,
-  deleteFile,
+  deleteElement
 };
