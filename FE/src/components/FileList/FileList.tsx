@@ -2,6 +2,7 @@ import React from 'react';
 import FileItem from '../FileItem/FileItem';
 import { Directory, File } from '../../interfaces/Element';
 import DirectoryItem from '../DirectoryItem/DirectoryItem';
+import './FileList.css';
 
 export interface FileListProps {
   directories: Directory[];

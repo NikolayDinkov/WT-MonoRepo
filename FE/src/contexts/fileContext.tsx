@@ -12,6 +12,8 @@ import { useAuth } from './authContext';
 interface FileContextType {
   myDrive: Element[];
   setMyDrive: React.Dispatch<React.SetStateAction<Element[]>>;
+  sharedFiles: Element[];
+  setSharedFiles: React.Dispatch<React.SetStateAction<Element[]>>;
   reloadFiles: () => Promise<void>;
 }
 
@@ -19,12 +21,15 @@ const FileContext = createContext<FileContextType | undefined>(undefined);
 
 export function FileProvider({ children }: { children: ReactNode }) {
   const [myDrive, setMyDrive] = useState<Element[]>([]);
+  const [sharedFiles, setSharedFiles] = useState<Element[]>([]);
   const { isLoggedIn, userId } = useAuth();
 
   const reloadFiles = async () => {
     if (isLoggedIn && userId) {
       try {
-        const files = await FileService.getUserElements(userId);
+        const files = await FileService.getUserElements();
+        const shared = await FileService.getSharedElements();
+        setSharedFiles(shared);
         setMyDrive(files);
       } catch (error) {
         setMyDrive([]);
@@ -40,7 +45,9 @@ export function FileProvider({ children }: { children: ReactNode }) {
   }, [isLoggedIn, userId]);
 
   return (
-    <FileContext.Provider value={{ myDrive, setMyDrive, reloadFiles }}>
+    <FileContext.Provider
+      value={{ myDrive, setMyDrive, sharedFiles, setSharedFiles, reloadFiles }}
+    >
       {children}
     </FileContext.Provider>
   );

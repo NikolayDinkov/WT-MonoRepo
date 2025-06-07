@@ -7,32 +7,51 @@ import * as FileService from '../services/file.service';
 
 const getAllElements = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const elements = await ElementService.getAllElementsForOwner(new Types.ObjectId(req.userId));
+    const elements = await ElementService.getAllElementsForOwner(
+      new Types.ObjectId(req.userId)
+    );
     res.status(200).json(elements);
   } catch (exError: any) {
-    res.status(400).json({ error: exError.message || 'Failed to fetch elements' });
+    res
+      .status(400)
+      .json({ error: exError.message || 'Failed to fetch elements' });
   }
 };
 
-const getAllSharedWithUser = async (req: AuthenticatedRequest, res: Response) => {
+const getAllSharedWithUser = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
-    const elements = await ElementService.getAllSharedElementsForUser(new Types.ObjectId(req.userId));
+    const elements = await ElementService.getAllSharedElementsForUser(
+      new Types.ObjectId(req.userId)
+    );
     res.status(200).json(elements);
   } catch (exError: any) {
-    res.status(400).json({ error: exError.message || 'Failed to fetch shared elements' });
+    res
+      .status(400)
+      .json({ error: exError.message || 'Failed to fetch shared elements' });
   }
-}
+};
 
 const getMetadataById = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const metadata = await ElementService.getMetadataById(new Types.ObjectId(req.userId), new Types.ObjectId(req.params.elementId));
+    const metadata = await ElementService.getMetadataById(
+      new Types.ObjectId(req.userId),
+      new Types.ObjectId(req.params.elementId)
+    );
     res.status(200).json(metadata);
   } catch (exError: any) {
-    res.status(400).json({ error: exError.message || 'Failed to fetch metadata' });
+    res
+      .status(400)
+      .json({ error: exError.message || 'Failed to fetch metadata' });
   }
-}
+};
 
-export const createDirectory = async (req: AuthenticatedRequest, res: Response) => {
+export const createDirectory = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
     const owner = new Types.ObjectId(req.userId);
     const { name, parent } = req.body;
@@ -47,11 +66,16 @@ export const createDirectory = async (req: AuthenticatedRequest, res: Response) 
 
     res.status(201).json(newDir);
   } catch (err: any) {
-    res.status(400).json({ error: err.message || 'Failed to create directory' });
+    res
+      .status(400)
+      .json({ error: err.message || 'Failed to create directory' });
   }
 };
 
-const uploadFile = async (req: AuthenticatedRequest, res: Response) : Promise<void>  => {
+const uploadFile = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No file uploaded' });
@@ -59,10 +83,15 @@ const uploadFile = async (req: AuthenticatedRequest, res: Response) : Promise<vo
     }
 
     const userId = new Types.ObjectId(req.userId);
-    const parentId = req.body.parentId ? new(req.body.parentId) : null;
+    const parentId = req.body.parentId ? new req.body.parentId() : null;
     const path = req.body.path || '/';
 
-    const element = await ElementService.uploadFileForOwner(userId, req.file, parentId, path);
+    const element = await ElementService.uploadFileForOwner(
+      userId,
+      req.file,
+      parentId,
+      path
+    );
 
     res.status(201).json({ message: 'File uploaded successfully', element });
   } catch (exError: any) {
@@ -71,12 +100,16 @@ const uploadFile = async (req: AuthenticatedRequest, res: Response) : Promise<vo
   }
 };
 
-const uploadFiles = async (req: AuthenticatedRequest, res: Response) : Promise<void> => {
+const uploadFiles = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
     const userId = new Types.ObjectId(req.userId);
-    const parentId = req.body.parentId ? new(req.body.parentId) : null;
-    const path = req.body.path || '/';
-
+    const parentId = req.body.parentId
+      ? new Types.ObjectId(req.body.parentId)
+      : null;
+    console.log(req.body.parentId);
     const files = req.files as Express.Multer.File[];
 
     if (!files || files.length === 0) {
@@ -84,7 +117,11 @@ const uploadFiles = async (req: AuthenticatedRequest, res: Response) : Promise<v
       return;
     }
 
-    const elements = await ElementService.uploadFilesForOwner(userId, files, parentId, path);
+    const elements = await ElementService.uploadFilesForOwner(
+      userId,
+      files,
+      parentId
+    );
 
     res.status(201).json({ message: 'Files uploaded successfully', elements });
   } catch (err: any) {
@@ -93,12 +130,13 @@ const uploadFiles = async (req: AuthenticatedRequest, res: Response) : Promise<v
   }
 };
 
-
 const downloadFile = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { stream, file } = await FileService.downloadFileById(req.params.fileId);
-    res.set("Content-Type", file.contentType);
-    res.set("Content-Disposition", `attachment; filename=${file.filename}`);
+    const { stream, file } = await FileService.downloadFileById(
+      req.params.fileId
+    );
+    res.set('Content-Type', file.contentType);
+    res.set('Content-Disposition', `attachment; filename=${file.filename}`);
     stream.pipe(res);
   } catch (exError: any) {
     res.status(400).json({ error: exError.message || 'File not found' });
@@ -108,9 +146,9 @@ const downloadFile = async (req: AuthenticatedRequest, res: Response) => {
 const downloadFiles = async (_req: AuthenticatedRequest, res: Response) => {
   try {
     const { archive } = await FileService.downloadMultipleFiles();
-    res.set("Content-Type", "application/zip");
-    res.set("Content-Disposition", "attachment; filename=files.zip");
-    res.set("Access-Control-Allow-Origin", "*");
+    res.set('Content-Type', 'application/zip');
+    res.set('Content-Disposition', 'attachment; filename=files.zip');
+    res.set('Access-Control-Allow-Origin', '*');
     archive.pipe(res);
   } catch (exError: any) {
     res.status(400).json({ error: exError.message || 'No files to download' });

@@ -9,11 +9,16 @@ export const getAllElementsForOwner = (userId: Types.ObjectId) => {
 };
 
 export const getAllSharedElementsForUser = (userId: Types.ObjectId) => {
-  return Element.find({ sharedWith: { $in: [userId] } }).lean().exec();
-}
+  return Element.find({ sharedWith: { $in: [userId] } })
+    .lean()
+    .exec();
+};
 
-export const getMetadataById = async (userId: Types.ObjectId, elementId: Types.ObjectId) => {
-  const element = await Element.findOne({ _id: elementId}).lean().exec();
+export const getMetadataById = async (
+  userId: Types.ObjectId,
+  elementId: Types.ObjectId
+) => {
+  const element = await Element.findOne({ _id: elementId }).lean().exec();
   if (!element) {
     throw new Error('Element not found');
   }
@@ -24,8 +29,7 @@ export const getMetadataById = async (userId: Types.ObjectId, elementId: Types.O
 
   if (element.type === 'file' && element.gridFsId) {
     return getFileMetadataById(element.gridFsId);
-  }
-  else if (element.type === 'directory') {
+  } else if (element.type === 'directory') {
     return getDirectoryMetadata(element.id);
   }
 };
@@ -36,8 +40,8 @@ async function getDirectoryMetadata(dirId: Types.ObjectId) {
   await collectFilesRecursively(dirId, files);
 
   const gridFsIds = files
-    .map(f => f.gridFsId)
-    .filter(id => id !== null) as Types.ObjectId[];
+    .map((f) => f.gridFsId)
+    .filter((id) => id !== null) as Types.ObjectId[];
 
   const gridFsFiles = await getFilesByIds(gridFsIds);
 
@@ -45,7 +49,7 @@ async function getDirectoryMetadata(dirId: Types.ObjectId) {
 
   return {
     totalSize,
-    fileCount: gridFsFiles.length
+    fileCount: gridFsFiles.length,
   };
 }
 
@@ -59,7 +63,7 @@ async function collectFilesRecursively(
     if (child.type === 'file') {
       result.push(child);
     } else if (child.type === 'directory') {
-      await collectFilesRecursively(new(child.id), result);
+      await collectFilesRecursively(new child.id(), result);
     }
   }
 }
@@ -85,7 +89,7 @@ async function checkIfFileIsSharedWithUser(
       break;
     }
 
-    if (parent.sharedWith.some(id => id.equals(userId))) {
+    if (parent.sharedWith.some((id) => id.equals(userId))) {
       return true;
     }
 
@@ -95,16 +99,20 @@ async function checkIfFileIsSharedWithUser(
   return false; // no access found
 }
 
-export const createDirectory = async (input: CreateDirectoryInput): Promise<IElement> => {
+export const createDirectory = async (
+  input: CreateDirectoryInput
+): Promise<IElement> => {
   const { name, parent, owner } = input;
 
-  let path = '/';
+  let path = `/${name}`;
   if (parent) {
     const parentElement = await Element.findById(parent).lean().exec();
     if (!parentElement || parentElement.type !== 'directory') {
       throw new Error('Invalid parent directory');
     }
-    path = `${parentElement.path}/${name}`;
+    if (parentElement) {
+      path = `${parentElement.path}/${name}`;
+    }
   }
 
   const newDirectory = await Element.create({
@@ -134,7 +142,7 @@ export const getDirectoriesByName = (name: string) => {
 
 export const deleteElementByGridFsId = (gridFsId: Types.ObjectId) => {
   return Element.deleteOne({ gridFsId }).exec();
-}
+};
 
 export const uploadFileForOwner = async (
   userId: Types.ObjectId,
@@ -146,7 +154,7 @@ export const uploadFileForOwner = async (
 
   const element = new Element({
     name: file.originalname,
-    path: path,
+    path: `${path}/${file.originalname}`,
     parent: parentId,
     owner: userId,
     sharedWith: [],
@@ -162,12 +170,25 @@ export const uploadFileForOwner = async (
 export const uploadFilesForOwner = async (
   userId: Types.ObjectId,
   files: Express.Multer.File[],
-  parentId: Types.ObjectId | null,
-  path: string
+  parentId: Types.ObjectId | null
 ) => {
+  let parentPath = '';
+  console.log(parentId);
+  if (parentId) {
+    const parentElement = await Element.findById(parentId).lean().exec();
+    if (!parentElement || parentElement.type !== 'directory') {
+      throw new Error('Invalid parent directory');
+    }
+    if (parentElement) {
+      parentPath = `${parentElement.path}`;
+    }
+  }
   const elements = files.map((file) => {
     const fileWithId = file as Express.Multer.File & { id: Types.ObjectId };
-
+    let path = `/${file.originalname}`;
+    if (parentId) {
+      path = `${parentPath}/${file.originalname}`;
+    }
     return new Element({
       name: file.originalname,
       path: path,

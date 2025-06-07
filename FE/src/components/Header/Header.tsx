@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import './Header.css';
 import { FiSearch, FiX, FiFolder, FiFileText, FiUser } from 'react-icons/fi';
 import { useFileContext } from '../../contexts/fileContext';
@@ -6,7 +7,7 @@ import { useFileContext } from '../../contexts/fileContext';
 const Header: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [filterType, setFilterType] = useState<'all' | 'folder' | 'file'>(
+  const [filterType, setFilterType] = useState<'all' | 'directory' | 'file'>(
     'all'
   );
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -79,18 +80,25 @@ const Header: React.FC = () => {
                 id="type-select"
                 value={filterType}
                 onChange={(e) =>
-                  setFilterType(e.target.value as 'all' | 'folder' | 'file')
+                  setFilterType(e.target.value as 'all' | 'directory' | 'file')
                 }
               >
                 <option value="all">Всичко</option>
-                <option value="folder">Директории</option>
+                <option value="directory">Директории</option>
                 <option value="file">Файлове</option>
               </select>
             </div>
 
             {filteredElements.length > 0 ? (
               filteredElements.map((element, idx) => (
-                <div key={idx} className="search-result-item">
+                <NavLink
+                  to={
+                    element.parent ? `/my-drive/${element.parent}` : '/my-drive'
+                  }
+                  key={idx}
+                  className="search-result-item"
+                  onClick={() => setShowResults(false)}
+                >
                   <div
                     style={{
                       display: 'flex',
@@ -108,7 +116,7 @@ const Header: React.FC = () => {
                       <div className="element-path">{element.path}</div>
                     </div>
                   </div>
-                </div>
+                </NavLink>
               ))
             ) : (
               <div className="no-results">Няма резултати</div>
@@ -125,7 +133,7 @@ const Header: React.FC = () => {
         </button>
         {showDropdown && (
           <>
-            <div className="dropdown-menu">
+            <div className="dropdown-profile-menu">
               <button className="exit-button" onClick={handleLogout}>
                 Logout
               </button>
