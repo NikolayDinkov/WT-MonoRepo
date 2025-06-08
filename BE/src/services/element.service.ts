@@ -144,6 +144,10 @@ export const shareElementWithUser = async (
     throw new Error('Not authorized to share this element');
   }
 
+  if (!element.type || element.type !== 'directory') {
+    throw new Error('Element must be a directory to share');
+  }
+  
   const sharedWithUserId = await getUserIdByUsername(sharedWithUserName);
 
   if (element.sharedWith.some((id) => id.equals(sharedWithUserId))) {
