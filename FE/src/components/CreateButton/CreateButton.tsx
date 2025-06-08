@@ -133,41 +133,6 @@ const CreateButton = () => {
               }}
             />
           </button>
-          <button
-            className="dropdown-item"
-            onClick={() => folderInputRef.current?.click()}
-            type="button"
-          >
-            <FaFolderOpen className="dropdown-icon" />
-            Качване на папка
-            <input
-              ref={folderInputRef}
-              id="folder-upload-input"
-              type="file"
-              style={{ display: 'none' }}
-              multiple
-              // @ts-ignore
-              webkitdirectory=""
-              // @ts-ignore
-              directory=""
-              onChange={async (e) => {
-                const files = e.target.files;
-                if (!files || files.length === 0) return;
-                try {
-                  await FileService.uploadFiles({
-                    files,
-                    parentId: directoryId || null,
-                  });
-                  reloadFiles();
-                } catch (err) {
-                  alert('Error uploading folder');
-                } finally {
-                  setIsOpen(false);
-                  if (folderInputRef.current) folderInputRef.current.value = '';
-                }
-              }}
-            />
-          </button>
         </div>
       )}
 

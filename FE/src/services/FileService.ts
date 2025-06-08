@@ -2,6 +2,7 @@ import axios from 'axios';
 import {
   CreateDirectoryPayload,
   Element,
+  ShareElementPayload,
   UploadFilesPayload,
 } from '../interfaces/Element';
 import getAuthToken from './AuthService';
@@ -66,6 +67,15 @@ export const FileService = {
     );
     // The backend returns { message, elements }, so return elements array
     return response.data.elements || response.data;
+  },
+  async shareElementWithUser(payload: ShareElementPayload): Promise<Element> {
+    const token = getAuthToken();
+    const response = await axios.post(`${API_BASE_URL}/share`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
   },
 };
 

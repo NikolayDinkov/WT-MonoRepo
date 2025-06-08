@@ -28,6 +28,11 @@ export interface UploadFilesPayload {
   parentId?: string | null; // Optional, if not provided, it will be uploaded to the root
 }
 
+export interface ShareElementPayload {
+  elementId: string;
+  sharedWithUserName: string;
+}
+
 export interface ElementButtonsProps {
   onlyInfo?: boolean;
   elementId: string;
