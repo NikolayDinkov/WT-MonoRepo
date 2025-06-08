@@ -21,7 +21,6 @@ const CreateButton = () => {
   const toggleMenu = () => {
     setIsOpen((prev) => !prev);
   };
-  console.log('directoryId', directoryId);
 
   const openFolderPopup = () => {
     setShowFolderPopup(true);
@@ -149,8 +148,8 @@ const CreateButton = () => {
               autoFocus
             />
             <div className="popup-actions">
-              <button onClick={handleSaveFolder}>Запази</button>
               <button onClick={closeFolderPopup}>Затвори</button>
+              <button onClick={handleSaveFolder}>Запази</button>
             </div>
           </div>
         </>

@@ -25,6 +25,7 @@ const DirectoryItem: React.FC<DirectoryItemProps> = ({
         elementType="directory"
         section={isMyFile ? 'my-drive' : 'shared-with-me'}
         elementId={directory._id}
+        elementName={directory.name}
       ></ElementButtons>
     </div>
   );

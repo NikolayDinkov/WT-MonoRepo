@@ -1,7 +1,8 @@
 .delete-element-button,
 .share-element-button,
 .info-element-button,
-.download-element-button {
+.download-element-button,
+.rename-element-button {
   background-color: transparent;
   border: none;
   color: rgba(255, 0, 0, 0.89);
@@ -13,6 +14,13 @@
   transition: color 0.2s ease;
 }
 
+.rename-element-button {
+  color: #ff9800;
+}
+.rename-element-button:hover {
+  color: #f57c00;
+  transform: scale(1.1);
+}
 .delete-element-button:hover {
   color: darkred;
   transform: scale(1.1);
@@ -33,6 +41,7 @@
 
 .share-element-button:hover {
   color: #388e3c;
+  transform: scale(1.1);
 }
 
 .element-buttons {

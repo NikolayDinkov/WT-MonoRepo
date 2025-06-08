@@ -33,9 +33,15 @@ export interface ShareElementPayload {
   sharedWithUserName: string;
 }
 
+export interface RenameElementPayload {
+  elementId: string;
+  newName: string;
+}
+
 export interface ElementButtonsProps {
   onlyInfo?: boolean;
   elementId: string;
   elementType: 'file' | 'directory';
   section: 'my-drive' | 'shared-with-me';
+  elementName: string;
 }
