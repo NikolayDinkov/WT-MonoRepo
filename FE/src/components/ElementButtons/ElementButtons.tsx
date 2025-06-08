@@ -15,14 +15,13 @@ function handleDownload(
   metaData: any
 ) {
   e.stopPropagation();
-  // async функция, използвай Promise
+
   downloadFile(elementId)
     .then((blob) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
 
-      // Ако имаш metadata, използвай името, иначе 'file'
       const filename = metaData?.filename || 'file';
 
       a.download = filename;
@@ -76,7 +75,11 @@ export default function ElementButtons({
           <>
             <button
               className="download-element-button"
-              onClick={(e) => handleDownload(e, elementId, metaData)}
+              onClick={async (e) => {
+                  const data = await loadMetadata(elementId);
+                  setMetadata(data);
+                  handleDownload(e, elementId, data)}
+              }
               title="Тегли файла"
             >
               <FaDownload />

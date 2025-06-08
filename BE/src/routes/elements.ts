@@ -16,7 +16,7 @@ router.post('/share', elementController.shareElementWithUser);
 router.post('/upload/file', upload().single('file'), elementController.uploadFile);
 router.post('/upload/files', upload().array('files'), elementController.uploadFiles);
 
-router.post('/download/file/:fileId', elementController.downloadFile);
+router.post('/download/file/:elementId', elementController.downloadFile);
 router.post('/download/files', elementController.downloadFiles);
 
 router.delete('/delete/:elementId', elementController.deleteElement);

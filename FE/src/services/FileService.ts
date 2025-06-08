@@ -107,12 +107,12 @@ export async function downloadFile(elementId: string): Promise<Blob> {
   const response = await axios.post(
     `${API_BASE_URL}/download/file/${elementId}`,
     {
-      responseType: 'blob',
     },
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      responseType: 'blob',
     }
   );
   return response.data;
