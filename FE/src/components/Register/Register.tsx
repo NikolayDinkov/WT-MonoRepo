@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../contexts/authContext';
 
@@ -8,6 +8,7 @@ import './Register.css';
 export default function Register() {
   const [errorMessage, setErrorMessage] = useState('');
   const { register } = useAuth();
+  const navigate = useNavigate();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,9 +30,10 @@ export default function Register() {
       password,
       confirmPassword,
     });
-    if (!result.success) {
+    if (result.success) {
+      navigate('/my-drive');
+    } else {
       setErrorMessage(result.errorMessage || 'Registration failed.');
-      return;
     }
     // On success, context will update and redirect handled by App
   }

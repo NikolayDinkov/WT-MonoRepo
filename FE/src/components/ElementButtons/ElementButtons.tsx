@@ -6,8 +6,10 @@ import {
   deleteElement,
   loadMetadata,
   downloadFile,
+  FileService,
 } from '../../services/FileService';
 import { useFileContext } from '../../contexts/fileContext';
+import { createPortal } from 'react-dom';
 
 function handleDownload(
   e: React.MouseEvent<HTMLButtonElement>,
@@ -68,6 +70,22 @@ export default function ElementButtons({
     reloadFiles();
   };
 
+  const handleShare = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await FileService.shareElementWithUser({
+        elementId,
+        sharedWithUserName: e.currentTarget.username.value.trim(),
+      });
+      alert('Файлът беше споделен успешно.');
+      setPopupType(null);
+    } catch (error) {
+      alert('Грешка при споделяне на файла.');
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <div className="element-buttons">
@@ -76,10 +94,10 @@ export default function ElementButtons({
             <button
               className="download-element-button"
               onClick={async (e) => {
-                  const data = await loadMetadata(elementId);
-                  setMetadata(data);
-                  handleDownload(e, elementId, data)}
-              }
+                const data = await loadMetadata(elementId);
+                setMetadata(data);
+                handleDownload(e, elementId, data);
+              }}
               title="Тегли файла"
             >
               <FaDownload />
@@ -126,63 +144,73 @@ export default function ElementButtons({
         )}
       </div>
 
-      {popupType && (
-        <>
-          <div className="overlay" onClick={closePopup} />
-          <div className="popup-centered">
-            {popupType === 'info' && (
-              <>
-                {metaData ? (
-                  <div className="meta-info-details">
-                    <p>
-                      <strong>Име:</strong> {metaData.filename || 'Няма данни'}
-                    </p>
-                    <p>
-                      <strong>Размер:</strong>{' '}
-                      {metaData.length
-                        ? `${(metaData.length / 1024).toFixed(3)} KB`
-                        : 'Няма данни'}
-                    </p>
-                    <p>
-                      <strong>Създаден на:</strong>{' '}
-                      {metaData.uploadDate
-                        ? new Date(metaData.uploadDate).toLocaleString()
-                        : 'Няма данни'}
-                    </p>
-                  </div>
-                ) : (
-                  <p>Зареждане...</p>
-                )}
-              </>
-            )}
-            {popupType === 'share' &&
-              section === 'my-drive' &&
-              elementType === 'directory' && (
+      {popupType &&
+        createPortal(
+          <>
+            <div className="overlay" onClick={closePopup} />
+            <div
+              className="popup-centered"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {popupType === 'info' && (
                 <>
-                  <h3>Споделяне на файла</h3>
-                  <input type="text" placeholder="Username" />
-                  {/* share logic should be added here */}
-                  <button className="approve-share-button">Сподели</button>
+                  {metaData ? (
+                    <div className="meta-info-details">
+                      <p>
+                        <strong>Име:</strong>{' '}
+                        {metaData.filename || 'Няма данни'}
+                      </p>
+                      <p>
+                        <strong>Размер:</strong>{' '}
+                        {metaData.length
+                          ? `${(metaData.length / 1024).toFixed(3)} KB`
+                          : 'Няма данни'}
+                      </p>
+                      <p>
+                        <strong>Създаден на:</strong>{' '}
+                        {metaData.uploadDate
+                          ? new Date(metaData.uploadDate).toLocaleString()
+                          : 'Няма данни'}
+                      </p>
+                    </div>
+                  ) : (
+                    <p>Зареждане...</p>
+                  )}
                 </>
               )}
-            {popupType === 'delete' && section === 'my-drive' && (
-              <>
-                <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
+              {popupType === 'share' &&
+                section === 'my-drive' &&
+                elementType === 'directory' && (
+                  <>
+                    <h3>Споделяне на файла</h3>
+                    <form onSubmit={handleShare}>
+                      <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                      />
+                      <button className="approve-share-button">Сподели</button>
+                    </form>
+                  </>
+                )}
+              {popupType === 'delete' && section === 'my-drive' && (
+                <>
+                  <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
+                  <div className="popup-actions">
+                    <button onClick={handleDelete}>Да</button>
+                    <button onClick={closePopup}>Не</button>
+                  </div>
+                </>
+              )}
+              {popupType !== 'delete' && (
                 <div className="popup-actions">
-                  {/* delete logic should be added here */}
-                  <button onClick={handleDelete}>Да</button>
-                  <button onClick={closePopup}>Не</button>
+                  <button onClick={closePopup}>Затвори</button>
                 </div>
-              </>
-            )}
-            {popupType !== 'delete' && (
-              <div className="popup-actions">
-                <button onClick={closePopup}>Затвори</button>
-              </div>
-            )}
-          </div>
-        </>
-      )}
+              )}
+            </div>
+          </>,
+          document.body
+        )}
     </>
   );
 }
