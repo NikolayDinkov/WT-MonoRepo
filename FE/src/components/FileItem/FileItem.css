@@ -15,14 +15,11 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
+  font-size: 18px;
 }
 
 .item-container:hover {
   background-color: #e6f0ff;
-}
-
-.item-icon {
-  font-size: 20px;
 }
 
 .item-name {
