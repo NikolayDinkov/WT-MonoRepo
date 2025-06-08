@@ -1,7 +1,9 @@
 import { getGridFSBucket } from '../config/database';
 import mongoose, { Types } from 'mongoose';
 
-export const getFileMetadataById = async (fileId: Types.ObjectId): Promise<any> => {
+export const getFileMetadataById = async (
+  fileId: Types.ObjectId
+): Promise<any> => {
   const bucket = getGridFSBucket();
   const files = await bucket.find({ _id: fileId }).toArray();
   if (files.length === 0) throw new Error('File not found');
@@ -19,9 +21,7 @@ export const downloadFileById = async (
   fileId: Types.ObjectId
 ): Promise<{ stream: any; file: any }> => {
   const bucket = getGridFSBucket();
-  const files = await bucket
-    .find({ _id: fileId })
-    .toArray();
+  const files = await bucket.find({ _id: fileId }).toArray();
 
   if (files.length === 0) throw new Error('File not found');
 
@@ -51,7 +51,10 @@ export const downloadMultipleFiles = async (): Promise<{ archive: any }> => {
   return { archive };
 };
 
-export const renameFileById = async (fileId: Types.ObjectId, newName: string) => {
+export const renameFileById = async (
+  fileId: Types.ObjectId,
+  newName: string
+) => {
   const bucket = getGridFSBucket();
   const files = await bucket.find({ _id: fileId }).toArray();
   if (files.length === 0) throw new Error('File not found');
