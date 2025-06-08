@@ -1,9 +1,40 @@
 import { useState } from 'react';
-import { FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
+import { FaDownload, FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
 import './ElementButtons.css';
 import { ElementButtonsProps } from '../../interfaces/Element';
+import {
+  deleteElement,
+  loadMetadata,
+  downloadFile,
+} from '../../services/FileService';
+import { useFileContext } from '../../contexts/fileContext';
 
-import { loadMetadata } from '../../services/FileService';
+function handleDownload(
+  e: React.MouseEvent<HTMLButtonElement>,
+  elementId: string,
+  metaData: any
+) {
+  e.stopPropagation();
+
+  downloadFile(elementId)
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+
+      const filename = metaData?.filename || 'file';
+
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => {
+      alert('Грешка при тегленето на файла');
+      console.error(error);
+    });
+}
 
 export default function ElementButtons({
   elementId,
@@ -22,21 +53,50 @@ export default function ElementButtons({
     setPopupType(null);
   };
 
+  const { reloadFiles } = useFileContext();
+
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    try {
+      await deleteElement(elementId);
+      alert('Файлът беше изтрит успешно.');
+      setPopupType(null);
+    } catch (error) {
+      alert('Грешка при изтриване на файла.');
+      console.log(error);
+    }
+    reloadFiles();
+  };
+
   return (
     <>
       <div className="element-buttons">
         {elementType === 'file' && (
-          <button
-            className="info-element-button"
-            onClick={async (e) => {
-              e.stopPropagation();
-              setPopupType('info');
-              const data = await loadMetadata(elementId);
-              setMetadata(data);
-            }}
-          >
-            <FaInfoCircle />
-          </button>
+          <>
+            <button
+              className="download-element-button"
+              onClick={async (e) => {
+                  const data = await loadMetadata(elementId);
+                  setMetadata(data);
+                  handleDownload(e, elementId, data)}
+              }
+              title="Тегли файла"
+            >
+              <FaDownload />
+            </button>
+
+            <button
+              className="info-element-button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                setPopupType('info');
+                const data = await loadMetadata(elementId);
+                setMetadata(data);
+              }}
+            >
+              <FaInfoCircle />
+            </button>
+          </>
         )}
 
         {section === 'my-drive' && (
@@ -79,8 +139,8 @@ export default function ElementButtons({
                     </p>
                     <p>
                       <strong>Размер:</strong>{' '}
-                      {metaData.chunkSize
-                        ? `${(metaData.chunkSize / 1024 / 1024).toFixed(2)} MB`
+                      {metaData.length
+                        ? `${(metaData.length / 1024).toFixed(3)} KB`
                         : 'Няма данни'}
                     </p>
                     <p>
@@ -110,7 +170,7 @@ export default function ElementButtons({
                 <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
                 <div className="popup-actions">
                   {/* delete logic should be added here */}
-                  <button onClick={closePopup}>Да</button>
+                  <button onClick={handleDelete}>Да</button>
                   <button onClick={closePopup}>Не</button>
                 </div>
               </>

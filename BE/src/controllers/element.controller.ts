@@ -139,19 +139,17 @@ const shareElementWithUser = async (
 ): Promise<void> => {
   try {
     const userId = new Types.ObjectId(req.userId);
-    const { elementId, sharedWithUserId } = req.body;
+    const { elementId, sharedWithUserName } = req.body;
 
-    if (!sharedWithUserId) {
-      res.status(400).json({ error: 'User ID is required' });
+    if (!sharedWithUserName) {
+      res.status(400).json({ error: 'Username is required' });
       return;
     }
-
-    const sharedWith = new Types.ObjectId(sharedWithUserId);
 
     const updatedElement = await ElementService.shareElementWithUser(
       userId,
       elementId,
-      sharedWith
+      sharedWithUserName
     );
 
     res
@@ -164,10 +162,19 @@ const shareElementWithUser = async (
   }
 }
 
-const downloadFile = async (req: AuthenticatedRequest, res: Response) => {
+const downloadFile = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
-    const { stream, file } = await FileService
-      .downloadFileById(req.params.fileId);
+    const {stream, file} = await ElementService.getFileStreamById(
+      new Types.ObjectId(req.params.elementId),
+      new Types.ObjectId(req.userId)
+    );
+    if (!stream || !file) {
+      res.status(404).json({ error: 'File not found' });
+      return;
+    }
 
     res.set('Content-Type', file.contentType);
     res.set('Content-Disposition', `attachment; filename=${file.filename}`);

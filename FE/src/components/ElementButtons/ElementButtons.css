@@ -1,6 +1,7 @@
 .delete-element-button,
 .share-element-button,
-.info-element-button {
+.info-element-button,
+.download-element-button {
   background-color: transparent;
   border: none;
   color: rgba(255, 0, 0, 0.89);
@@ -15,6 +16,15 @@
 
 .delete-element-button:hover {
   color: darkred;
+  transform: scale(1.1);
+}
+
+.download-element-button {
+  color: blue;
+}
+
+.download-element-button:hover {
+  color: darkblue;
   transform: scale(1.1);
 }
 

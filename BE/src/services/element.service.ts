@@ -2,39 +2,43 @@ import Element, { IElement } from '../models/element.model';
 import { Types } from 'mongoose';
 import { getGridFSBucket } from '../config/database';
 
-import { getFileMetadataById, getFilesByIds, renameFileById } from './file.service';
+import { getFileMetadataById, getFilesByIds, renameFileById, downloadFileById } from './file.service';
+import { getUserIdByUsername } from './user.service';
+
 import { CreateDirectoryInput } from '../interfaces/createDirectoryInput';
 
 export const getAllElementsForOwner = (userId: Types.ObjectId) => {
   return Element.find({ owner: userId }).lean().exec();
 };
 
-export async function getAllSharedElementsForUser(userId: Types.ObjectId) {
+export const getAllSharedElementsForUser = async (userId: Types.ObjectId) => {
   const rootDirs = await Element.find({ sharedWith: { $in: [userId] } })
     .lean()
     .exec();
 
-    // Make an array and get every element below the root directories
-  const allSharedElements: IElement[] = [];
+  const allSharedElements: IElement[] = [rootDirs].flat();
+
   for (const root of rootDirs) {
-    await collectSharedElementsRecursively(root.id, allSharedElements, userId);
+    await collectSharedElementsRecursively(root._id as Types.ObjectId, allSharedElements);
   }
+
   return allSharedElements;
 }
 
 async function collectSharedElementsRecursively(
   parentId: Types.ObjectId,
-  result: IElement[],
-  userId: Types.ObjectId
+  result: IElement[]
 ) {
+  if (!parentId)
+    return;
+
   const children = await Element.find({ parent: parentId }).lean().exec();
 
   for (const child of children) {
-    if (child.sharedWith.includes(userId)) {
-      result.push(child);
-    }
+    result.push(child);
+
     if (child.type === 'directory') {
-      await collectSharedElementsRecursively(child.id, result, userId);
+      await collectSharedElementsRecursively(child._id as Types.ObjectId, result);
     }
   }
 }
@@ -127,7 +131,7 @@ async function checkIfFileIsSharedWithUser(
 export const shareElementWithUser = async (
   userId: Types.ObjectId,
   elementId: Types.ObjectId,
-  ownerId: Types.ObjectId
+  sharedWithUserName: string
 ): Promise<IElement> => {
   const element = await Element
     .findById(elementId)
@@ -136,10 +140,13 @@ export const shareElementWithUser = async (
   if (!element) {
     throw new Error('Element not found');
   }
-  if (!element.owner.equals(ownerId)) {
+  if (!element.owner.equals(userId)) {
     throw new Error('Not authorized to share this element');
   }
-  if (element.sharedWith.some((id) => id.equals(userId))) {
+
+  const sharedWithUserId = await getUserIdByUsername(sharedWithUserName);
+
+  if (element.sharedWith.some((id) => id.equals(sharedWithUserId))) {
     throw new Error('Element already shared with this user');
   }
 
@@ -150,13 +157,13 @@ export const shareElementWithUser = async (
     if (!parent) {
       break;
     }
-    if (parent.sharedWith.some((id) => id.equals(userId))) {
-      return element;
+    if (parent.sharedWith.some((id) => id.equals(sharedWithUserId))) {
+      return element; // User already has access through a parent directory
     }
     currentElement = parent;
   }
 
-  element.sharedWith.push(userId);
+  element.sharedWith.push(sharedWithUserId);
   await element.save();
   return element;
 }
@@ -269,7 +276,7 @@ export const uploadFilesForOwner = async (
   parentId: Types.ObjectId | null
 ) => {
   let parentPath = '';
-  console.log(parentId);
+  
   if (parentId) {
     const parentElement = await Element.findById(parentId).lean().exec();
     if (!parentElement || parentElement.type !== 'directory') {
@@ -300,6 +307,29 @@ export const uploadFilesForOwner = async (
 
   return elements;
 };
+
+export const getFileStreamById = async (
+  elementId: Types.ObjectId,
+  userId: Types.ObjectId
+): Promise<{ stream: any; file: any }> => {
+  const element = await Element
+    .findById(elementId)
+    .lean()
+    .exec();
+  if (!element) {
+    throw new Error('Element not found');
+  }
+
+  if (!checkIfFileIsSharedWithUser(userId, elementId)) {
+    throw new Error('You do not have permission to access this element');
+  }
+
+  if (element.type !== 'file' || !element.gridFsId) {
+    throw new Error('Element is not a file or does not have a GridFS ID');
+  }
+
+  return downloadFileById(element.gridFsId);
+}
 
 export const renameElementById = async (
   elementId: Types.ObjectId,
