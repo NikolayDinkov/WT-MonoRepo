@@ -57,3 +57,11 @@ export const loginUser = async (data: LoginData) => {
 
   return { userId: existingUser.id, token };
 };
+
+export const getUserIdByUsername = async (userName: string) => {
+  const existingUser = await User.findOne({ username: userName.toLowerCase() });
+  if (!existingUser) {
+    throw { status: 404, message: 'User not found' };
+  }
+  return existingUser.id;
+}

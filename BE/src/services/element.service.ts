@@ -3,6 +3,8 @@ import { Types } from 'mongoose';
 import { getGridFSBucket } from '../config/database';
 
 import { getFileMetadataById, getFilesByIds, renameFileById, downloadFileById } from './file.service';
+import { getUserIdByUsername } from './user.service';
+
 import { CreateDirectoryInput } from '../interfaces/createDirectoryInput';
 
 export const getAllElementsForOwner = (userId: Types.ObjectId) => {
@@ -15,24 +17,28 @@ export const getAllSharedElementsForUser = async (userId: Types.ObjectId) => {
     .exec();
 
   const allSharedElements: IElement[] = [rootDirs].flat();
+
   for (const root of rootDirs) {
-    await collectSharedElementsRecursively(root._id as Types.ObjectId, allSharedElements, userId);
+    await collectSharedElementsRecursively(root._id as Types.ObjectId, allSharedElements);
   }
+
   return allSharedElements;
 }
 
 async function collectSharedElementsRecursively(
   parentId: Types.ObjectId,
-  result: IElement[],
-  userId: Types.ObjectId
+  result: IElement[]
 ) {
+  if (!parentId)
+    return;
+
   const children = await Element.find({ parent: parentId }).lean().exec();
 
   for (const child of children) {
     result.push(child);
 
     if (child.type === 'directory') {
-      await collectSharedElementsRecursively(child.id, result, userId);
+      await collectSharedElementsRecursively(child._id as Types.ObjectId, result);
     }
   }
 }
@@ -125,7 +131,7 @@ async function checkIfFileIsSharedWithUser(
 export const shareElementWithUser = async (
   userId: Types.ObjectId,
   elementId: Types.ObjectId,
-  ownerId: Types.ObjectId
+  sharedWithUserName: string
 ): Promise<IElement> => {
   const element = await Element
     .findById(elementId)
@@ -134,10 +140,13 @@ export const shareElementWithUser = async (
   if (!element) {
     throw new Error('Element not found');
   }
-  if (!element.owner.equals(ownerId)) {
+  if (!element.owner.equals(userId)) {
     throw new Error('Not authorized to share this element');
   }
-  if (element.sharedWith.some((id) => id.equals(userId))) {
+
+  const sharedWithUserId = await getUserIdByUsername(sharedWithUserName);
+
+  if (element.sharedWith.some((id) => id.equals(sharedWithUserId))) {
     throw new Error('Element already shared with this user');
   }
 
@@ -148,13 +157,13 @@ export const shareElementWithUser = async (
     if (!parent) {
       break;
     }
-    if (parent.sharedWith.some((id) => id.equals(userId))) {
-      return element;
+    if (parent.sharedWith.some((id) => id.equals(sharedWithUserId))) {
+      return element; // User already has access through a parent directory
     }
     currentElement = parent;
   }
 
-  element.sharedWith.push(userId);
+  element.sharedWith.push(sharedWithUserId);
   await element.save();
   return element;
 }

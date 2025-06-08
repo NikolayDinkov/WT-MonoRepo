@@ -139,19 +139,17 @@ const shareElementWithUser = async (
 ): Promise<void> => {
   try {
     const userId = new Types.ObjectId(req.userId);
-    const { elementId, sharedWithUserId } = req.body;
+    const { elementId, sharedWithUserName } = req.body;
 
-    if (!sharedWithUserId) {
-      res.status(400).json({ error: 'User ID is required' });
+    if (!sharedWithUserName) {
+      res.status(400).json({ error: 'Username is required' });
       return;
     }
-
-    const sharedWith = new Types.ObjectId(sharedWithUserId);
 
     const updatedElement = await ElementService.shareElementWithUser(
       userId,
       elementId,
-      sharedWith
+      sharedWithUserName
     );
 
     res
