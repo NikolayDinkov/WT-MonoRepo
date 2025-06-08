@@ -7,7 +7,6 @@
   color: rgba(255, 0, 0, 0.89);
   cursor: pointer;
   font-size: 18px;
-  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,4 +61,8 @@
   cursor: pointer;
   transition: background 0.2s;
   margin: 4px;
+}
+
+.popup-centered input[type='text'].share-input {
+  width: 100%;
 }

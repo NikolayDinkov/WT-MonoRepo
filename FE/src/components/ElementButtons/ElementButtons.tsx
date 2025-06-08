@@ -172,6 +172,11 @@ export default function ElementButtons({
                           ? new Date(metaData.uploadDate).toLocaleString()
                           : 'Няма данни'}
                       </p>
+                      <div className="popup-actions">
+                        <button type="button" onClick={closePopup}>
+                          Затвори
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <p>Зареждане...</p>
@@ -188,24 +193,30 @@ export default function ElementButtons({
                         type="text"
                         name="username"
                         placeholder="Username"
+                        className="share-input"
+                        required
                       />
-                      <button className="approve-share-button">Сподели</button>
+                      <div className="popup-actions">
+                        <button type="button" onClick={closePopup}>
+                          Затвори
+                        </button>
+                        <button type="submit">Сподели</button>
+                      </div>
                     </form>
                   </>
                 )}
               {popupType === 'delete' && section === 'my-drive' && (
                 <>
-                  <h3>Сигурни ли сте, че искате да изтриете този файл?</h3>
+                  <h3>
+                    Сигурни ли сте, че искате да изтриете
+                    {elementType === 'file' ? ' този файл' : ' тази директория'}
+                    ?
+                  </h3>
                   <div className="popup-actions">
-                    <button onClick={handleDelete}>Да</button>
                     <button onClick={closePopup}>Не</button>
+                    <button onClick={handleDelete}>Да</button>
                   </div>
                 </>
-              )}
-              {popupType !== 'delete' && (
-                <div className="popup-actions">
-                  <button onClick={closePopup}>Затвори</button>
-                </div>
               )}
             </div>
           </>,

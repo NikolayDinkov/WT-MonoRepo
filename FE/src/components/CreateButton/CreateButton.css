@@ -118,14 +118,15 @@
   padding: 0.5rem 1.2rem;
   border: none;
   border-radius: 5px;
-  background: #0b57d0;
+  background: #aaa;
   color: #fff;
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
+  margin: 0 auto;
 }
 .popup-actions button:last-child {
-  background: #aaa;
+  background: #0b57d0;
 }
 .popup-actions button:hover {
   opacity: 0.9;
