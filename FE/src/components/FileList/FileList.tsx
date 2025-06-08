@@ -17,7 +17,6 @@ const FileList: React.FC<FileListProps> = ({
   isMyFile: isMyFile,
   onDirectoryClick,
 }) => {
-  console.log(directories, files);
   return (
     <div className="file-list">
       {directories.map((dir) => (

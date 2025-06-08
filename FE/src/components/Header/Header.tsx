@@ -165,7 +165,7 @@ const Header: React.FC = () => {
           <>
             <div className="dropdown-profile-menu">
               <button className="exit-button" onClick={handleLogout}>
-                Logout
+                Изход
               </button>
             </div>
           </>

@@ -48,10 +48,7 @@ const getMetadataById = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-const createDirectory = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+const createDirectory = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const owner = new Types.ObjectId(req.userId);
     const { name, parent } = req.body;
@@ -152,22 +149,20 @@ const shareElementWithUser = async (
       sharedWithUserName
     );
 
-    res
-      .status(200)
-      .json(updatedElement);
+    res.status(200).json(updatedElement);
   } catch (exError: any) {
     res
       .status(400)
       .json({ error: exError.message || 'Failed to share element' });
   }
-}
+};
 
 const downloadFile = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   try {
-    const {stream, file} = await ElementService.getFileStreamById(
+    const { stream, file } = await ElementService.getFileStreamById(
       new Types.ObjectId(req.params.elementId),
       new Types.ObjectId(req.userId)
     );
@@ -196,12 +191,16 @@ const downloadFiles = async (_req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-const renameFile = async (req: AuthenticatedRequest, res: Response) => {
+const renameElement = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
     const userId = new Types.ObjectId(req.userId);
     const { elementId, newName } = req.body;
     if (!elementId || !newName) {
-      return res.status(400).json({ error: 'File ID and new name are required' });
+      res.status(400).json({ error: 'File ID and new name are required' });
+      return;
     }
 
     const result = await ElementService.renameElementById(
@@ -209,17 +208,14 @@ const renameFile = async (req: AuthenticatedRequest, res: Response) => {
       newName,
       userId
     );
-    
+
     res.status(200).json(result);
   } catch (exError: any) {
     res.status(400).json({ error: exError.message || 'Rename failed' });
   }
 };
 
-const deleteElement = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+const deleteElement = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = new Types.ObjectId(req.userId);
     const elementId = new Types.ObjectId(req.params.elementId);
@@ -244,6 +240,6 @@ export default {
   uploadFiles,
   downloadFile,
   downloadFiles,
-  renameFile,
+  renameElement,
   deleteElement,
 };
