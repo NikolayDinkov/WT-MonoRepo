@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { FaDownload, FaInfoCircle, FaShareAlt, FaTrash } from 'react-icons/fa';
+import {
+  FaDownload,
+  FaInfoCircle,
+  FaShareAlt,
+  FaTrash,
+  FaEdit,
+} from 'react-icons/fa';
 import './ElementButtons.css';
 import { ElementButtonsProps } from '../../interfaces/Element';
 import {
@@ -42,9 +48,10 @@ export default function ElementButtons({
   elementId,
   elementType,
   section,
+  elementName,
 }: ElementButtonsProps) {
   const [popupType, setPopupType] = useState<
-    null | 'info' | 'share' | 'delete'
+    null | 'info' | 'share' | 'delete' | 'rename'
   >(null);
 
   const [metaData, setMetadata] = useState<any>(null);
@@ -65,7 +72,7 @@ export default function ElementButtons({
       setPopupType(null);
     } catch (error) {
       alert('Грешка при изтриване на файла.');
-      console.log(error);
+      console.error(error);
     }
     reloadFiles();
   };
@@ -82,6 +89,27 @@ export default function ElementButtons({
       setPopupType(null);
     } catch (error) {
       alert('Грешка при споделяне на файла.');
+      console.error(error);
+    }
+  };
+
+  const handleRename = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await FileService.renameElement({
+        elementId,
+        newName:
+          e.currentTarget.newname.value.trim() +
+          (elementType === 'file'
+            ? '.' + elementName.split('.').slice(1).join('.')
+            : ''),
+      });
+      alert('Името беше променено успешно.');
+      setPopupType(null);
+      reloadFiles();
+    } catch (error) {
+      alert('Грешка при преименуване на файла.');
       console.error(error);
     }
   };
@@ -120,16 +148,27 @@ export default function ElementButtons({
         {section === 'my-drive' && (
           <>
             {elementType === 'directory' && (
-              <button
-                className="share-element-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPopupType('share');
-                }}
-              >
-                <FaShareAlt />
-              </button>
+              <>
+                <button
+                  className="share-element-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPopupType('share');
+                  }}
+                >
+                  <FaShareAlt />
+                </button>
+              </>
             )}
+            <button
+              className="rename-element-button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                setPopupType('rename');
+              }}
+            >
+              <FaEdit />
+            </button>
 
             <button
               className="delete-element-button"
@@ -205,6 +244,32 @@ export default function ElementButtons({
                     </form>
                   </>
                 )}
+              {popupType === 'rename' && section === 'my-drive' && (
+                <>
+                  <h3>
+                    Преименуване на{' '}
+                    {elementType === 'file' ? 'файл' : 'директория'}
+                  </h3>
+                  <form onSubmit={handleRename}>
+                    <input
+                      type="text"
+                      name="newname"
+                      placeholder="Ново име"
+                      className="share-input"
+                      required
+                      defaultValue={
+                        elementName?.split('.')[0] || elementName || ''
+                      }
+                    />
+                    <div className="popup-actions">
+                      <button type="button" onClick={closePopup}>
+                        Затвори
+                      </button>
+                      <button type="submit">Преименувай</button>
+                    </div>
+                  </form>
+                </>
+              )}
               {popupType === 'delete' && section === 'my-drive' && (
                 <>
                   <h3>

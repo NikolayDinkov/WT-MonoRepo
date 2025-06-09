@@ -1,31 +1,18 @@
 import User from '../models/user.model';
 
-const jwt = require('jsonwebtoken');
-
-interface SignupData {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface LoginData {
-  username: string;
-  password: string;
-}
+import jwt from 'jsonwebtoken';
 
 export const signupUser = async (data: SignupData) => {
   const { firstName, lastName, username, email, password } = data;
 
   const existingUserByUsername = await User.findOne({ username });
   if (existingUserByUsername) {
-    throw { status: 409, message: 'User with this username already exists' };
+    throw new Error('USERNAME_EXISTS');
   }
 
   const existingUserByEmail = await User.findOne({ email });
   if (existingUserByEmail) {
-    throw { status: 409, message: 'User with this email already exists' };
+    throw new Error('EMAIL_EXISTS');
   }
 
   const newUser = new User({ firstName, lastName, username, email, password });
@@ -43,12 +30,12 @@ export const loginUser = async (data: LoginData) => {
 
   const existingUser = await User.findOne({ username });
   if (!existingUser) {
-    throw { status: 401, message: 'Invalid username or password' };
+    throw new Error('INVALID_CREDENTIALS');
   }
 
   const isValidPassword = await existingUser.matchPassword(password);
   if (!isValidPassword) {
-    throw { status: 401, message: 'Invalid username or password' };
+    throw new Error('INVALID_CREDENTIALS');
   }
 
   const token = jwt.sign({ userId: existingUser.id }, process.env.SECRET_KEY!, {
@@ -61,7 +48,7 @@ export const loginUser = async (data: LoginData) => {
 export const getUserIdByUsername = async (userName: string) => {
   const existingUser = await User.findOne({ username: userName.toLowerCase() });
   if (!existingUser) {
-    throw { status: 404, message: 'User not found' };
+    throw new Error('USER_NOT_FOUND');
   }
   return existingUser.id;
-}
+};
