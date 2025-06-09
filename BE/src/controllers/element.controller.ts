@@ -198,8 +198,12 @@ const renameElement = async (
   try {
     const userId = new Types.ObjectId(req.userId);
     const { elementId, newName } = req.body;
-    if (!elementId || !newName) {
-      res.status(400).json({ error: 'File ID and new name are required' });
+    if (!elementId) {
+      res.status(400).json({ error: 'File ID is required' });
+      return;
+    }
+    if (!newName || newName.trim() === '') {
+      res.status(400).json({ error: 'New name cannot be empty' });
       return;
     }
 

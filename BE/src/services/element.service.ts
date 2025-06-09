@@ -363,8 +363,32 @@ export const renameElementById = async (
   if (existingElement) {
     throw new Error('An element with the same name already exists in this directory');
   }
-  
-  // Update the element's name and path
+
+  if (element.type === 'file') {
+    await renameFile(element.id, newName, ownerId);
+  }
+  else if (element.type === 'directory') {
+    await renameDirectory(element.id, newName, ownerId);
+  }
+
+  return element;
+}
+
+const renameFile = async (
+  fileId: Types.ObjectId,
+  newName: string,
+  userId: Types.ObjectId
+): Promise<void> => {
+  const element = await Element.findOne({
+    _id: fileId,
+    type: 'file',
+    owner: userId,
+  });
+
+  if (!element) {
+    throw new Error('File not found');
+  }
+
   element.name = newName;
   if (element.parent) {
     const parentElement = await Element.findById(element.parent).lean().exec();
@@ -377,13 +401,42 @@ export const renameElementById = async (
     element.path = `/${newName}`;
   }
   await element.save();
-
-  if (element.type === 'file' && element.gridFsId) {
+  if (element.gridFsId) {
     renameFileById(element.gridFsId, newName);
   }
+};
 
-  return element;
-}
+const renameDirectory = async (
+  directoryId: Types.ObjectId,
+  newName: string,
+  userId: Types.ObjectId
+): Promise<void> => {
+  const directory = await Element.findOne({
+    _id: directoryId,
+    type: 'directory',
+    owner: userId,
+  });
+
+  if (!directory) {
+    throw new Error('Directory not found');
+  }
+
+  const oldPath = directory.path;
+  const newPath = oldPath.replace(/[^/]+$/, newName);
+
+  directory.name = newName;
+  directory.path = newPath;
+  await directory.save();
+
+  const descendants = await Element.find({
+    path: { $regex: `^${oldPath}/` },
+  });
+
+  for (const child of descendants) {
+    child.path = child.path.replace(oldPath, newPath);
+    await child.save();
+  }
+};
 
 export const createElement = (elementData: {
   name: string;
